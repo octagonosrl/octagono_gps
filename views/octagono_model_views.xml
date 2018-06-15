@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Menu General Marcas y Modelos -->
+        <menuitem id="menu_octagono_model_general"
+                  name="Marcas y Modelos"
+                  parent="octagono_gps.menu_octagono_config"
+                  sequence="1"/>
+
+        <!-- Views Octa GPS Model -->
+        <!-- Octa GPS Model View Tree -->
+        <record model="ir.ui.view" id="octagono_model_view_form">
+            <field name="name">octagono.model.form</field>
+            <field name="model">octagono.model</field>
+            <field name="arch" type="xml">
+                <form string="Model">
+                    <sheet>
+                        <field name="image_medium" widget="image" class="oe_avatar"/>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" placeholder="e.g. Camry"/>
+                            </h1>
+                            <label for="brand_id" class="oe_edit_only"/>
+                            <h2>
+                                <field name="brand_id" placeholder="e.g Toyota"/>
+                            </h2>
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Octa GPS Model View Tree -->
+        <record model="ir.ui.view" id="octagono_model_view_tree">
+            <field name="name">octagono.model.tree</field>
+            <field name="model">octagono.model</field>
+            <field name="arch" type="xml">
+                <tree string="Models">
+                    <field name="brand_id"/>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Octa GPS Model View Search -->
+        <record model="ir.ui.view" id="octa_gps_model_view_search">
+            <field name="name">octagono.model.search</field>
+            <field name="model">octagono.model</field>
+            <field name="arch" type="xml">
+                <search string="Vehicles model">
+                    <field name="brand_id"/>
+                    <group expand="1" string="Group by">
+                        <filter name="groupby_brand" context="{'group_by': 'brand_id'}" string="Make"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <!-- Octa GPS Model Action -->
+        <record model="ir.actions.act_window" id="octagono_model_action">
+            <field name="name">Modelo de vehículo</field>
+            <field name="res_model">octagono.model</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_groupby_brand": True,}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a new model.
+                </p>
+                <p>
+                    You can define several models (e.g. A3, A4) for each make (Audi).
+                </p>
+            </field>
+        </record>
+        <!-- Menu action Octa GPS Model -->
+        <menuitem action="octagono_model_action" parent="octagono_gps.menu_octagono_model_general" id="menu_octagono_model"
+                  sequence="1"/>
+
+        <!-- View Octa GPS Model Brand -->
+        <!-- Octa GPS Model Brand View Tree -->
+        <record model="ir.ui.view" id="octagono_model_brand_view_tree">
+            <field name="name">octagono.model.brand.tree</field>
+            <field name="model">octagono.model.brand</field>
+            <field name="arch" type="xml">
+                <tree string="Model Make">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Octa GPS Model Brand View Form -->
+        <record model="ir.ui.view" id="octagono_model_brand_view_form">
+            <field name="name">octagono.model.brand.form</field>
+            <field name="model">octagono.model.brand</field>
+            <field name="arch" type="xml">
+                <form string="Model Make">
+                    <group>
+                        <div>
+                            <field name="image_medium" widget="image" class="oe_avatar"/>
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- Octa GPS Model Brand View Kanban -->
+        <record model="ir.ui.view" id="octagono_model_brand_view_kanban">
+            <field name="name">octagono.model.brand.kanban</field>
+            <field name="model">octagono.model.brand</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="image"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click">
+                                <div class="oe_kanan_virgnette oe_semantic_html_override">
+                                    <div class="o_kanban_image">
+                                        <img t-att-src="kanban_image('octagono.model.brand', 'image', record.id.raw_value)"/>
+                                    </div>
+                                    <div class="oe_kanban_details">
+                                        <h4 class="oe_partner_heading">
+                                            <a type="open" class="o_kanban_record_title">
+                                                <field name="name"/>
+                                            </a>
+                                        </h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Octa GPS Model Brand Action -->
+        <record model="ir.actions.act_window" id="octagono_model_brand_action">
+            <field name="name">Marcas de vehículos</field>
+            <field name="res_model">octagono.model.brand</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a new make.
+                </p>
+            </field>
+        </record>
+
+        <!-- Menu Action Octa GPS Model Brand -->
+        <menuitem action="octagono_model_brand_action" parent="octagono_gps.menu_octagono_model_general"
+                  id="menu_octagono_model_brand" sequence="2"/>
+    </data>
+</odoo>
