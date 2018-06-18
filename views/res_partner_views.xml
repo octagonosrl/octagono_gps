@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
+        <menuitem id="res_partner_menu"
+                  name="Clientes"
+                  parent="octagono_gps_menu_root"
+                  action="base.action_partner_form"
+                  sequence="3"/>
+
         <record id="act_res_partner_2_octagono_gps" model="ir.actions.act_window">
             <field name="name">Registros de Octagono</field>
             <field name="res_model">octagono.gps</field>
