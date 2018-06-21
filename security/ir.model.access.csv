@@ -10,6 +10,7 @@ user_octagono_gps,user_octagono_gps,model_octagono_gps,group_octagono_gps_user,1
 user_octagono_gps_line,user_octagono_gps_line,model_octagono_gps_line,group_octagono_gps_user,1,1,1,0
 user_octagono_model,user_octagono_model,model_octagono_model,group_octagono_gps_user,1,1,1,0
 user_octagono_model_brand,user_octagono_model_brand,model_octagono_model_brand,group_octagono_gps_user,1,1,1,0
+user_octagono_gps_tags,user_octagono_gps_tags,model_octagono_gps_tags,group_octagono_gps_user,1,1,1,0
 
 
 access_octagono_gps,access_octagono_gps,model_octagono_gps,,1,0,0,0
