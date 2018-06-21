@@ -119,6 +119,7 @@ class OctagonoGPS(models.Model):
     procurement_group_id = fields.Many2one('procurement.group', 'Procurement Group', copy=False)
     is_waiting = fields.Boolean(compute="_compute_is_waiting")
     is_assign = fields.Boolean(compute="_compute_is_assign")
+    p_installation = fields.Many2many('octagono.gps.tags', 'octagono_gps_tags_rel', string="P. Instalacion")
 
     def _compute_is_expired(self):
         now = datetime.now()
@@ -392,6 +393,7 @@ class OctagonoGPS(models.Model):
         for item in range(today.year - date_start.year + 1):
             date_id = date_label = str(date_start.year + item)
             select.append((date_id, date_label))
+        select.reverse()
         return select
 
     @api.onchange('driver')
@@ -1052,3 +1054,13 @@ class OctagonoGPSLine(models.Model):
         return {
             'domain': {'product_lot_id': [('id', 'in', available_lot_ids)]}
         }
+
+
+class OctagonoGPSTags(models.Model):
+    _name = 'octagono.gps.tags'
+    _description = 'Octagono GPS Tagas'
+
+    name = fields.Char(required=True, translate=True)
+    color = fields.Integer('Color Index', default=10)
+
+    _sql_constraints = [('name_uniq', 'unique (name)', "Tag name already exists !")]

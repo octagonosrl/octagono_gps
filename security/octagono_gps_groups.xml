@@ -8,18 +8,15 @@
 
         <record id="group_octagono_gps_user" model="res.groups">
             <field name="name">Usuario</field>
-            <field name="description">Nivel de acceso de usuario para este módulo, puede crear y modificar.</field>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
             <field name="category_id" ref="octagono_gps.module_category_octagono_gps"/>
         </record>
 
         <record id="group_octagono_gps_manager" model="res.groups">
             <field name="name">Responsable</field>
-            <field name="description">Nivel de acceso de manager para este módulo, tiene todos los privilegios.</field>
             <field name="category_id" ref="octagono_gps.module_category_octagono_gps"/>
             <field name="implied_ids" eval="[(4, ref('group_octagono_gps_user'))]"/>
             <field name="users" eval="[(4, ref('base.user_root'))]"/>
         </record>
-
     </data>
 </odoo>

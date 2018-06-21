@@ -233,14 +233,16 @@
                             </group>
                         </page>
                         <page string="Datos de la instalacion">
-                            <group col="1">
+                            <group col="2">
                                 <group>
-                                    <field name="blocking_type"
-                                           attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
                                     <field name="install_date"
                                            attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
                                     <field name="installer_id" options="{'no_create': True}"
                                            attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
+                                </group>
+                                <group>
+                                    <field name="blocking_type" attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
+                                    <field name="p_installation" widget="many2many_tags" options="{'color_field': 'color'}"/>
                                 </group>
                             </group>
                         </page>
@@ -296,26 +298,29 @@
                 <field name="partner_id" operator="child_of"/>
                 <field name="user_id"/>
                 <field name="product_id"/>
-                <filter string="Mis registros" domain="[('user_id','=',uid)]" name="my_octagono_gps_filter"/>
+                <filter string="Mis registros" name="my_octagono_gps_filter" domain="[('user_id','=',uid)]"/>
                 <filter string="Borradores" name="draft" domain="[('state','=','draft')]"/>
                 <filter string="Registros enviados" name="sent" domain="[('state','=','sent')]"/>
                 <filter string="Registrados" name="registered" domain="[('state','=','registered')]"/>
+                <filter string="Productos Asignados" name="registered" domain="[('state','=','assigned')]"/>
                 <filter string="Confirmados" name="done" domain="[('state','=','done')]"/>
+                <filter string="Registro Archivados" name="archived" domain="[('active', '=', 0)]"/>
                 <separator/>
-                <filter string="Unread Messages" name="message_needaction" domain="[('message_needaction','=',True)]"/>
+                <filter string="Mensajes no leídos" name="message_needaction" domain="[('message_needaction','=',True)]"/>
                 <separator/>
-                <filter string="My Activities" name="activities_my" domain="[('activity_ids.user_id', '=', uid)]"/>
+                <filter string="Mis actividades" name="activities_my" domain="[('activity_ids.user_id', '=', uid)]"/>
                 <separator/>
-                <filter string="Late Activities" name="activities_overdue" domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"
-                        help="Show all records which has next action date is before today"/>
-                <filter string="Today Activities" name="activities_today" domain="[('activity_ids.date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
-                <filter string="Future Activities" name="activities_upcoming_all" domain="[('activity_ids.date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Actividades tardías" name="activities_overdue" domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"
+                        help="Mostrar todos los registros que tienen la próxima fecha de acción antes de hoy"/>
+                <filter string="Actividades de hoy" name="activities_today" domain="[('activity_ids.date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Actividades futuras" name="activities_upcoming_all" domain="[('activity_ids.date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
+
                 <group expand="1" string="Group By">
-                    <filter string="Usuario" domain="[]" context="{'group_by':'user_id'}"/>
-                    <filter name="propetario" string="Propetario" domain="[]" context="{'group_by':'partner_id'}"/>
+                    <filter string="Usuario" name="users" domain="[]" context="{'group_by':'user_id'}"/>
+                    <filter string="Propetario" name="propetario" domain="[]" context="{'group_by':'partner_id'}"/>
                     <filter string="Mes del registro" domain="[]" context="{'group_by':'date_order'}"/>
-                    <filter name="create_date" string="Fecha de creacion" domain="[]" context="{'group_by': 'create_date'}"/>
-                    <filter name="create_date" string="Fecha de confirmacion" domain="[]" context="{'group_by': 'confirmation_date'}"/>
+                    <filter string="Fecha de creacion" name="create_date" domain="[]" context="{'group_by': 'create_date'}"/>
+                    <filter string="Fecha de confirmacion" name="create_date" domain="[]" context="{'group_by': 'confirmation_date'}"/>
                 </group>
             </search>
         </field>
@@ -412,5 +417,33 @@
         <field name="default" eval="False"/>
         <field name="description">Quotation confirmed</field>
     </record>
+
+    <!-- Octagono GPS Tag tree view -->
+    <record id="view_octagono_gps_tags_form" model="ir.ui.view">
+        <field name="name">octagono.tag.tree</field>
+        <field name="model">octagono.gps.tags</field>
+        <field name="arch" type="xml">
+            <form string="Vehicle Tags">
+                <group>
+                    <field name="name"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- Octagono GPS Tag action view -->
+    <record id="action_octagono_gps_tags" model="ir.actions.act_window">
+        <field name="name">Etiquetas P. Instalacion</field>
+        <field name="res_model">octagono.gps.tags</field>
+        <field name="view_type">form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click para agregar una nueva etiqueta.
+            </p>
+        </field>
+    </record>
+
+    <!-- Octagono GPS Tag menu item -->
+    <menuitem id="menu_octagono_gps_tags" action="action_octagono_gps_tags" parent="menu_octagono_config" sequence="2"/>
 
 </odoo>

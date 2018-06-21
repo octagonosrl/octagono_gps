@@ -2,10 +2,7 @@
 <odoo>
     <data>
         <!-- Menu General Marcas y Modelos -->
-        <menuitem id="menu_octagono_model_general"
-                  name="Marcas y Modelos"
-                  parent="octagono_gps.menu_octagono_config"
-                  sequence="1"/>
+        <menuitem id="menu_octagono_model_general" name="Marcas y Modelos" parent="octagono_gps.menu_octagono_config" sequence="1"/>
 
         <!-- Views Octa GPS Model -->
         <!-- Octa GPS Model View Tree -->
@@ -73,8 +70,7 @@
             </field>
         </record>
         <!-- Menu action Octa GPS Model -->
-        <menuitem action="octagono_model_action" parent="octagono_gps.menu_octagono_model_general" id="menu_octagono_model"
-                  sequence="1"/>
+        <menuitem action="octagono_model_action" parent="octagono_gps.menu_octagono_model_general" id="menu_octagono_model" sequence="1"/>
 
         <!-- View Octa GPS Model Brand -->
         <!-- Octa GPS Model Brand View Tree -->
@@ -152,7 +148,6 @@
         </record>
 
         <!-- Menu Action Octa GPS Model Brand -->
-        <menuitem action="octagono_model_brand_action" parent="octagono_gps.menu_octagono_model_general"
-                  id="menu_octagono_model_brand" sequence="2"/>
+        <menuitem id="menu_octagono_model_brand" action="octagono_model_brand_action" parent="octagono_gps.menu_octagono_model_general" sequence="2"/>
     </data>
 </odoo>
