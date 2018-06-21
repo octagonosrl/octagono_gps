@@ -18,7 +18,7 @@ class ProductTemplate(models.Model):
     @api.multi
     def action_view_octagono(self):
         self.ensure_one()
-        action = self.env.ref('octagono.action_product_octagono_list')
+        action = self.env.ref('octagono_gps.action_product_octagono_list')
         product_ids = self.with_context(active_test=False).product_variant_ids.ids
 
         return {
@@ -33,7 +33,7 @@ class ProductTemplate(models.Model):
             'domain': [('state', 'in', ['octagono', 'done']), ('product_id.product_tmpl_id', '=', self.id)],
         }
 
-    octagono_count = fields.Integer(compute='_octagono_count', string='# Octagono')
+    octagono_count = fields.Integer(compute='_octagono_count', string='# Vehiculos')
     octagono_ok = fields.Boolean(string='Puede ser tratado en octagono gps', default=False)
 
     description_octagono = fields.Text(

@@ -1,147 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <data>
+    <record id="product_template_form_view_inherit_octagono" model="ir.ui.view">
+        <field name="name">product.template.form.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='options']" position="inside">
+                <div>
+                    <field name="octagono_ok"/>
+                    <label for="octagono_ok"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
 
-        <!--======= vista heredada de product_template_form_view ===========-->
-        <record id="product_template_form_view_octagono" model="ir.ui.view">
-            <field name="name">product.template.octagono</field>
-            <field name="model">product.template</field>
-            <field name="inherit_id" ref="product.product_template_form_view"/>
-            <field name="arch" type="xml">
-                <!--========== agregando opcion de octagono ================-->
-                <xpath expr="//div[@name='options']" position="inside">
-                    <div>
-                        <field name="octagono_ok"/>
-                        <label for="octagono_ok"/>
-                    </div>
-                </xpath>
-                <!--============= agregando boton de octagono count ========-->
-                <button name="toggle_active" position="before">
-                    <button class="oe_stat_button"
-                            name="%(octagono_gps.action_product_octagono_list)d"
-                            type="action"
-                            icon="fas fa-car"
-                            attrs="{'invisible': [('octagono_ok', '=', False)]}">
-                        <field string="Vehiculos" name="octagono_count" widget="statinfo"/>
-                    </button>
+    <record id="product_template_only_form_inherit_octagono" model="ir.ui.view">
+        <field name="name">product.template.form.only.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='toggle_active']" position="before">
+                <button name="%(octagono_gps.action_product_octagono_list)d" type="action"
+                    icon="fas fa-car" class="oe_stat_button"
+                    attrs="{'invisible': [('octagono_count', '&lt;=', 1)]}">
+                    <field string="Vehiculos" name="octagono_count" widget="statinfo" />
                 </button>
-                <group name="description" position="inside">
-                    <group string="Description for Octagono" attrs="{'invisible': [('octagono_ok','=',False)]}">
-                        <field name="description_octagono" nolabel="1"
-                               placeholder="Esta nota aparecerá en los registros de octagono."/>
-                    </group>
-                </group>
-            </field>
-        </record>
+            </xpath>
+        </field>
+    </record>
 
-        <!--========== vista heredada de product_template_search_view ==========-->
-        <record id="product_template_search_view_inherit_octagono" model="ir.ui.view">
-            <field name="name">product.template.search.inherit</field>
-            <field name="model">product.template</field>
-            <field name="inherit_id" ref="product.product_template_search_view"/>
-            <field name="arch" type="xml">
-                <xpath expr="//filter[@name='filter_to_purchase']" position="after">
-                    <filter string="Puede ser tratado en octagono gps" name="filter_to_octagono"
-                            domain="[('octagono_ok', '=', 1)]"/>
-                </xpath>
-            </field>
-        </record>
+    <record id="product_template_search_view_inherit_octagono" model="ir.ui.view">
+        <field name="name">product.template.search.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='filter_to_purchase']" position="after">
+                <filter string="Puede ser tratado en octagono gps" name="filter_to_octagono" domain="[('octagono_ok', '=', 1)]"/>
+            </xpath>
+        </field>
+    </record>
 
-        <!--======== action product template for octagono =========-->
-        <record id="product_template_action_octagono" model="ir.actions.act_window">
-            <field name="name">Productos</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">product.template</field>
-            <field name="view_mode">kanban,tree,form</field>
-            <field name="view_type">form</field>
-            <field name="view_id" ref="product.product_template_kanban_view"/>
-            <field name="context">{"search_default_filter_to_octagono":1}</field>
-            <field name="help" type="html">
-                <p class="oe_view_nocontent_create">
-                    Click to define a new product.
-                </p>
-                <p>
-                    You must define a product for everything you sell, whether it's a physical product, a consumable or
-                    a service you offer to customers.
-                </p>
-                <p>
-                    The product form contains information to simplify the sale process: price, notes in the quotation,
-                    accounting data, procurement methods, etc.
-                </p>
-            </field>
-        </record>
+    <record id="product_template_action_octagono" model="ir.actions.act_window">
+        <field name="name">Productos</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_type">form</field>
+        <field name="view_id" ref="product.product_template_kanban_view"/>
+        <field name="search_view_id" ref="octagono_gps.product_template_search_view_inherit_octagono"/>
+        <field name="context">{"search_default_filter_to_octagono":1}</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to define a new product.
+            </p>
+            <p>
+                You must define a product for everything you sell, whether it's a physical product, a consumable or
+                a service you offer to customers.
+            </p>
+            <p>
+                The product form contains information to simplify the sale process: price, notes in the quotation,
+                accounting data, procurement methods, etc.
+            </p>
+        </field>
+    </record>
 
-        <!--other menus product-->
-        <menuitem id="product_menu_catalog"
-                  name="Catalogo"
-                  parent="octagono_gps.octagono_gps_menu_root"
-                  sequence="4"/>
-        <menuitem id="product_menu_product"
-                  action="product_template_action_octagono"
-                  parent="product_menu_catalog"
-                  sequence="1"/>
-        <menuitem id="menu_product"
-                  name="Product Variants"
-                  parent="product_menu_catalog"
-                  sequence="2"
-                  groups="product.group_product_variant"
-                  active="False"/>
-        <menuitem action="product.product_template_action"
-                  id="menu_product_template_action"
-                  parent="product_menu_catalog"
-                  sequence="1"
-                  active="False"/>
-        <menuitem id="prod_config_main"
-                  name="Products"
-                  parent="octagono_gps.menu_octagono_config"
-                  sequence="5"/>
-        <menuitem id="menu_attribute_action"
-                  action="product.attribute_action"
-                  parent="prod_config_main"
-                  sequence="1"
-                  groups="product.group_product_variant"
-                  active="False"/>
-        <menuitem action="product.variants_action"
-                  id="menu_variants_action"
-                  parent="octagono_gps.prod_config_main"
-                  sequence="2"
-                  groups="product.group_product_variant"
-                  active="False"/>
-        <menuitem id="menu_products"
-                  action="product.product_normal_action_sell"
-                  parent="product_menu_catalog"
-                  groups="product.group_product_variant"
-                  sequence="2" active="False"/>
-        <menuitem id="next_id_16"
-                  name="Units of Measure"
-                  parent="octagono_gps.prod_config_main"
-                  sequence="6"
-                  groups="product.group_uom"
-                  active="False"/>
-        <menuitem action="product.product_uom_form_action"
-                  id="menu_product_uom_form_action"
-                  parent="octagono_gps.prod_config_main"
-                  sequence="7"
-                  groups="product.group_uom"
-                  active="False"/>
-        <menuitem action="product.product_uom_categ_form_action"
-                  id="menu_product_uom_categ_form_action"
-                  parent="octagono_gps.prod_config_main"
-                  sequence="8"
-                  groups="product.group_uom"
-                  active="False"/>
-        <menuitem id="menu_product_pricelist_main"
-                  name="Pricelists"
-                  parent="product_menu_catalog"
-                  action="product.product_pricelist_action2"
-                  groups="product.group_sale_pricelist"
-                  sequence="3"
-                  active="False"/>
+    <!--other menus product-->
+    <menuitem id="product_menu_catalog" name="Catalogo" parent="octagono_gps.octagono_gps_menu_root" sequence="4"/>
+    <menuitem id="product_menu_product"  action="octagono_gps.product_template_action_octagono" parent="product_menu_catalog" sequence="1"/>
+    <menuitem id="menu_product" name="Product Variants" parent="product_menu_catalog" sequence="2" groups="product.group_product_variant" active="False"/>
+    <menuitem id="menu_product_template_action" action="product.product_template_action" parent="product_menu_catalog" sequence="1" active="False"/>
+    <menuitem id="prod_config_main" name="Products" parent="octagono_gps.menu_octagono_config" sequence="5"/>
+    <menuitem id="menu_attribute_action" action="product.attribute_action" parent="prod_config_main" sequence="1" groups="product.group_product_variant"  active="False"/>
+    <menuitem id="menu_variants_action" action="product.variants_action" parent="octagono_gps.prod_config_main" sequence="2" groups="product.group_product_variant" active="False"/>
+    <menuitem id="menu_products" action="product.product_normal_action_sell" parent="product_menu_catalog" groups="product.group_product_variant" sequence="2" active="False"/>
+    <menuitem id="next_id_16" name="Units of Measure" parent="octagono_gps.prod_config_main" sequence="6" groups="product.group_uom" active="False"/>
+    <menuitem id="menu_product_uom_form_action" action="product.product_uom_form_action" parent="octagono_gps.prod_config_main" sequence="7" groups="product.group_uom" active="False"/>
+    <menuitem id="menu_product_uom_categ_form_action" action="product.product_uom_categ_form_action" parent="octagono_gps.prod_config_main" sequence="8" groups="product.group_uom" active="False"/>
+    <menuitem id="menu_product_pricelist_main" name="Pricelists" parent="product_menu_catalog" action="product.product_pricelist_action2" groups="product.group_sale_pricelist" sequence="3" active="False"/>
 
-        <menuitem id="product_menu_lot_serial"
-                  action="stock.action_production_lot_form"
-                  parent="product_menu_catalog"
-                  sequence="2"/>
+    <menuitem id="product_menu_lot_serial" action="stock.action_production_lot_form" parent="product_menu_catalog" sequence="2"/>
 
-    </data>
 </odoo>

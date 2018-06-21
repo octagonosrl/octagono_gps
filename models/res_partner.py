@@ -9,9 +9,8 @@ class ResPartner(models.Model):
     octagono_gps_ids = fields.One2many('octagono.gps', 'partner_id', 'Octagono GPS')
 
     def _compute_octagono_gps_count(self):
-        octagono_data = self.env['octagono.gps'].read_group(domain=[('partner_id', 'child_of', self.ids)],
-                                                            fields=['partner_id'],
-                                                            groupby=['partner_id'])
+        octagono_data = self.env['octagono.gps']. \
+            read_group(domain=[('partner_id', 'child_of', self.ids)], fields=['partner_id'], groupby=['partner_id'])
         # read to keep the child/parent relation while aggregating the read_group result in the loop
         partner_child_ids = self.read(['child_ids'])
         mapped_data = dict([(m['partner_id'][0], m['partner_id_count']) for m in octagono_data])

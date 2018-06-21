@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 import logging
 import datetime as _date
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+from itertools import groupby
+from operator import itemgetter
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.osv import expression
-from odoo.tools import float_compare, DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, pycompat
 from odoo.addons import decimal_precision as dp
+from odoo.tools.float_utils import float_compare, float_round, float_is_zero
 
 _logger = logging.getLogger(__name__)
 
@@ -15,10 +18,11 @@ _logger = logging.getLogger(__name__)
 class OctagonoGPS(models.Model):
     _name = 'octagono.gps'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _description = "Octagono GPS"
+    _description = "GPS"
+    _order = 'date_order desc, id desc'
     _sql_constraints = [
-        ('octagono_gps_vin_sn_unique', 'unique(vin_sn)', 'Vin SN name already exists'),
-        ('octagono_gps_license_plate_unique', 'unique(license_plate)', 'License Plate name already exists'),
+        ('octagono_gps_vin_sn_unique', 'unique(vin_sn)', 'La numeracion del chasis ya existe.'),
+        ('octagono_gps_license_plate_unique', 'unique(license_plate)', 'La numeracion de la matriculo o placa existe.'),
     ]
 
     @api.model
@@ -39,95 +43,64 @@ class OctagonoGPS(models.Model):
         for order in self:
             order.order_line._compute_tax_id()
 
-    name = fields.Char(string='Referencia', compute='_compute_name', store=True)
-    origin = fields.Char(string='Documento fuente',
-                         help="Referencia del documento que generó esta solicitud de orden de regstro de vehiculo.")
-    client_order_ref = fields.Char(string='Customer Reference', copy=False)
-
-    state = fields.Selection([
-        ('draft', 'Borrador'),
-        ('sent', 'Registro Enviado'),
-        ('registered', 'Registrado'),
-        ('done', 'Bloqueado'),
-        ('cancel', 'Cancelado'),
-    ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', default='draft')
-    date_order = fields.Datetime(string='Order Date', required=True, readonly=True, index=True,
-                                 states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, copy=False,
-                                 default=fields.Datetime.now)
-    validity_date = fields.Date(string='Expiration Date', readonly=True, copy=False,
-                                states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
-                                help="Manually set the expiration date of your quotation (offer), or it will set the "
-                                     "date automatically based on the template if online quotation is installed.")
-    is_expired = fields.Boolean(compute='_compute_is_expired', string="Is expired")
-    create_date = fields.Datetime(string='Creation Date', readonly=True, index=True,
-                                  help="Date on which sales order is created.")
-    confirmation_date = fields.Datetime(string='Fecha de confirmación', readonly=True, index=True,
-                                        help="Date on which the sales order is confirmed.", oldname="date_confirm",
-                                        copy=False)
-    user_id = fields.Many2one('res.users', string='Usuario', index=True, track_visibility='onchange',
-                              default=lambda self: self.env.user)
-    partner_id = fields.Many2one('res.partner', string='Propetario', readonly=True,
-                                 states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, required=True,
-                                 change_default=True, index=True, track_visibility='always')
-    partner_invoice_id = fields.Many2one('res.partner', string='Invoice Address', readonly=True, required=True,
-                                         states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
-                                         help="Invoice address for current sales order.")
-    partner_shipping_id = fields.Many2one('res.partner', string='Delivery Address', readonly=True, required=True,
-                                          states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
-                                          help="Delivery address for current sales order.")
-
-    pricelist_id = fields.Many2one('product.pricelist', string='Pricelist', required=True, readonly=True,
-                                   states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
-                                   help="Pricelist for current sales order.")
-    currency_id = fields.Many2one("res.currency", related='pricelist_id.currency_id', string="Currency", readonly=True,
-                                  required=True)
-
-    order_line = fields.One2many('octagono.gps.line', 'order_id', string='Order Lines',
-                                 states={'cancel': [('readonly', True)], 'done': [('readonly', True)]}, copy=True,
-                                 auto_join=True)
-
-    note = fields.Text('Nota', default=_default_note)
-
-    payment_term_id = fields.Many2one('account.payment.term', string='Payment Terms', oldname='payment_term')
-    fiscal_position_id = fields.Many2one('account.fiscal.position', oldname='fiscal_position', string='Fiscal Position')
-    company_id = fields.Many2one('res.company', 'Empresa',
-                                 default=lambda self: self.env['res.company']._company_default_get('octagono.gps'))
-
-    product_id = fields.Many2one('product.product', related='order_line.product_id', string='Product')
-    # Campo relacionados a vehiculos
-    active = fields.Boolean(default=True, track_visibility="onchange")
-
-    blocking_type = fields.Selection(selection=[('b0', 'B0'), ('b1', 'B1'), ('b2', 'B2'), ('b3', 'B3')],
-                                     default='b0', string="Tipo de bloqueo")
-    color = fields.Selection(selection='gen_colors')
-
-    driver = fields.Char('Responsable o Conductor')
-    image = fields.Binary(related='model_id.image', string="Logo")
-
-    image_medium = fields.Binary(related='model_id.image_medium', string="Logo (medium)")
-
-    image_small = fields.Binary(related='model_id.image_small', string="Logo (small)")
-
-    license_plate = fields.Char('Matricula', required=True, track_visibility='onchange', help="Numero de matriculo o "
-                                                                                              "placa del vehiculo")
-    install_date = fields.Date(required=True)
-
-    installer_id = fields.Many2one('hr.employee', "Instalador",
-                                   domain="[('department_id.name', 'in', ['Operaciones', 'operaciones'])]",
-                                   required=True)
-
-    model_id = fields.Many2one('octagono.model', "Modelo", required=True, help="Model of the vehicle")
-
-    model_year = fields.Selection(selection='gen_date_select', string="Año del modelo", required=True)
-    vin_sn = fields.Char("Num. Chasis", required=True, copy=False, help="Unique number written on the "
-                                                                        "vehicle motor (VIN/SN number)")
-
     @api.model
     def _default_warehouse_id(self):
         company = self.env.user.company_id.id
         warehouse_ids = self.env['stock.warehouse'].search([('company_id', '=', company)], limit=1)
         return warehouse_ids
 
+    name = fields.Char(string='Referencia', compute='_compute_name', store=True)
+    origin = fields.Char(string='Documento fuente', help="Referencia del documento que generó esta solicitud "
+                                                         "de orden de regstro de vehiculo.")
+    client_order_ref = fields.Char(string='Customer Reference', copy=False)
+    state = fields.Selection([
+        ('draft', 'Borrador'),
+        ('sent', 'Registro Enviado'),
+        ('registered', 'Registrado'),
+        ('done', 'Bloqueado'),
+        ('assigned', 'Producto Asignado'),
+        ('valid_product', 'Producto Validado'),
+        ('cancel', 'Cancelado'),
+    ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', default='draft')
+    date_order = fields.Datetime(string='Order Date', required=True, readonly=True, index=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, copy=False, default=fields.Datetime.now)
+    validity_date = fields.Date(string='Expiration Date', readonly=True, copy=False, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
+                                help="Manually set the expiration date of your quotation (offer), or it will set the "
+                                     "date automatically based on the template if online quotation is installed.")
+    is_expired = fields.Boolean(compute='_compute_is_expired', string="Is expired")
+    create_date = fields.Datetime(string='Creation Date', readonly=True, index=True, help="Date on which sales order is created.")
+    confirmation_date = fields.Datetime(string='Fecha de confirmación', readonly=True, index=True, copy=False,
+                                        help="Date on which the sales order is confirmed.", oldname="date_confirm")
+    user_id = fields.Many2one('res.users', string='Usuario', index=True, track_visibility='onchange',
+                              default=lambda self: self.env.user)
+    partner_id = fields.Many2one('res.partner', string='Propetario', readonly=True,
+                                 states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, required=True,
+                                 change_default=True, index=True, track_visibility='always')
+    partner_invoice_id = fields.Many2one('res.partner', string='Invoice Address', readonly=True, required=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Invoice address for current sales order.")
+    partner_shipping_id = fields.Many2one('res.partner', string='Dirección de entrega', readonly=True, required=True,  states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Delivery address for current sales order.")
+    pricelist_id = fields.Many2one('product.pricelist', string='Pricelist', required=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Pricelist for current sales order.")
+    currency_id = fields.Many2one("res.currency", related='pricelist_id.currency_id', string="Currency", readonly=True, required=True)
+    order_line = fields.One2many('octagono.gps.line', 'order_id', string='Order Lines', states={'cancel': [('readonly', True)], 'done': [('readonly', True)]}, copy=True, auto_join=True)
+    note = fields.Text('Nota', default=_default_note)
+    payment_term_id = fields.Many2one('account.payment.term', string='Payment Terms', oldname='payment_term')
+    fiscal_position_id = fields.Many2one('account.fiscal.position', oldname='fiscal_position', string='Fiscal Position')
+    company_id = fields.Many2one('res.company', 'Empresa', default=lambda self: self.env['res.company']._company_default_get('octagono.gps'))
+    product_id = fields.Many2one('product.product', related='order_line.product_id', string='Product')
+    product_lot_id = fields.Many2one('stock.production.lot', related='order_line.product_lot_id', string='Serial del producto')
+    # Campo relacionados a vehiculos
+    active = fields.Boolean(default=True, track_visibility="onchange")
+    blocking_type = fields.Selection(selection=[('b0', 'B0'), ('b1', 'B1'), ('b2', 'B2'), ('b3', 'B3')], default='b0', string="Tipo de bloqueo")
+    color = fields.Selection(selection='gen_colors')
+    driver = fields.Char('Responsable o Conductor')
+    image = fields.Binary(related='model_id.image', string="Logo")
+    image_medium = fields.Binary(related='model_id.image_medium', string="Logo (medium)")
+    image_small = fields.Binary(related='model_id.image_small', string="Logo (small)")
+    license_plate = fields.Char('Matricula', required=True, track_visibility='onchange', help="Numero de matriculo o "
+                                                                                              "placa del vehiculo")
+    install_date = fields.Datetime(required=True, index=True, default=lambda self: fields.Datetime.now())
+    installer_id = fields.Many2one('hr.employee', "Instalador", domain="[('department_id.name', 'in', ['Operaciones', 'operaciones'])]", required=True)
+    model_id = fields.Many2one('octagono.model', "Modelo", required=True, help="Model of the vehicle")
+    model_year = fields.Selection(selection='gen_date_select', string="Año del modelo", required=True)
+    vin_sn = fields.Char("Num. Chasis", required=True)
     incoterm = fields.Many2one(
         'stock.incoterms', 'Incoterms',
         help="International Commercial Terms are a series of predefined "
@@ -144,6 +117,8 @@ class OctagonoGPS(models.Model):
     picking_ids = fields.One2many('stock.picking', 'octagono_id', string='Pickings')
     delivery_count = fields.Integer(string='Delivery Orders', compute='_compute_picking_ids')
     procurement_group_id = fields.Many2one('procurement.group', 'Procurement Group', copy=False)
+    is_waiting = fields.Boolean(compute="_compute_is_waiting")
+    is_assign = fields.Boolean(compute="_compute_is_assign")
 
     def _compute_is_expired(self):
         now = datetime.now()
@@ -209,45 +184,10 @@ class OctagonoGPS(models.Model):
             'user_id': self.partner_id.user_id.id or self.env.uid,
             'driver': self.partner_id.display_name,
         }
-        if self.env['ir.config_parameter'].sudo().get_param(
-                'sale.use_sale_note') and self.env.user.company_id.sale_note:
-            values['note'] = self.with_context(lang=self.partner_id.lang).env.user.company_id.sale_note
-
-        # if self.partner_id.team_id:
-        #     values['team_id'] = self.partner_id.team_id.id
+        if self.env.user.company_id.octagono_note:
+            values['note'] = self.with_context(lang=self.partner_id.lang).env.user.company_id.octagono_note
 
         self.update(values)
-
-    @api.onchange('partner_id')
-    def onchange_partner_id_warning(self):
-        if not self.partner_id:
-            return
-        warning = {}
-        title = False
-        message = False
-        partner = self.partner_id
-
-        # Si el socio no tiene ninguna advertencia, verifique su compañía
-        if partner.sale_warn == 'no-message' and partner.parent_id:
-            partner = partner.parent_id
-
-        if partner.sale_warn != 'no-message':
-            # Bloquear si el socio solo tiene una advertencia, pero la empresa matriz está bloqueada
-            if partner.sale_warn != 'block' and partner.parent_id and partner.parent_id.sale_warn == 'block':
-                partner = partner.parent_id
-            title = ("Warning for %s") % partner.name
-            message = partner.sale_warn_msg
-            warning = {
-                'title': title,
-                'message': message,
-            }
-            if partner.sale_warn == 'block':
-                self.update({'partner_id': False, 'partner_invoice_id': False, 'partner_shipping_id': False,
-                             'pricelist_id': False})
-                return {'warning': warning}
-
-        if warning:
-            return {'warning': warning}
 
     def validate_product(self, product_ids):
         """
@@ -303,11 +243,9 @@ class OctagonoGPS(models.Model):
             addr = partner.address_get(['delivery', 'invoice'])
             vals['partner_invoice_id'] = vals.setdefault('partner_invoice_id', addr['invoice'])
             vals['partner_shipping_id'] = vals.setdefault('partner_shipping_id', addr['delivery'])
-            vals['pricelist_id'] = vals.setdefault('pricelist_id',
-                                                   partner.property_product_pricelist and partner.property_product_pricelist.id)
-        # _logger.info('create ===> %s', vals)
-        result = super(OctagonoGPS, self).create(vals)
-        return result
+            vals['pricelist_id'] = vals.setdefault('pricelist_id', partner.property_product_pricelist and partner.property_product_pricelist.id)
+
+        return super(OctagonoGPS, self).create(vals)
 
     @api.multi
     def copy_data(self, default=None):
@@ -406,9 +344,9 @@ class OctagonoGPS(models.Model):
     @api.multi
     def action_confirm(self):
         self._action_confirm()
-        self.action_done()
         return True
 
+    # observacion
     @api.multi
     def _get_tax_amount_by_group(self):
         self.ensure_one()
@@ -428,6 +366,7 @@ class OctagonoGPS(models.Model):
         res = [(l[0].name, l[1]['amount'], l[1]['base'], len(res)) for l in res]
         return res
 
+    # observacion
     @api.multi
     def _notification_recipients(self, message, groups):
         groups = super(OctagonoGPS, self)._notification_recipients(message, groups)
@@ -485,7 +424,6 @@ class OctagonoGPS(models.Model):
                 name = [record.model_id.brand_id.name, record.model_id.name, record.license_plate]
                 record.name = '/'.join(name)
 
-    # funciones inherit.sale.order
     @api.depends('picking_ids')
     def _compute_picking_ids(self):
         for order in self:
@@ -498,10 +436,10 @@ class OctagonoGPS(models.Model):
 
     @api.multi
     def action_view_delivery(self):
-        """
-        This function returns an action that display existing delivery orders
-        of given sales order ids. It can either be a in a list or in a form
-        view, if there is only one delivery order to show.
+        """"
+        Esta función devuelve una acción que muestra las órdenes de picking existentes de
+        identificadores de órdenes de registros dados.
+        Cuando solo se encuentre uno, muestre la selección de inmediato.
         """
         action = self.env.ref('stock.action_picking_tree_all').read()[0]
 
@@ -513,79 +451,125 @@ class OctagonoGPS(models.Model):
             action['res_id'] = pickings.id
         return action
 
+    @api.depends('picking_ids', 'picking_ids.state')
+    def _compute_is_waiting(self):
+        for order in self:
+            if order.picking_ids and all([x.state in ['waiting', 'confirmed'] for x in order.picking_ids]):
+                order.is_waiting = True
+            else:
+                order.is_waiting = False
+
+    @api.depends('picking_ids', 'picking_ids.state')
+    def _compute_is_assign(self):
+        for order in self:
+            if order.picking_ids and all([x.state in ['assigned', 'done'] for x in order.picking_ids]):
+                order.is_assign = True
+            else:
+                order.is_assign = False
+
+    @api.multi
+    @api.depends('picking_ids')
+    def validate_picking(self):
+        for picking in self.mapped('picking_ids'):
+            picking.button_validate()
+        self.update({'state': 'valid_product'})
+
+    @api.multi
+    def action_assign_custom(self):
+        assigned_moves = self.env['stock.move']
+        partially_available_moves = self.env['stock.move']
+        for move in self.order_line.mapped('move_ids').filtered(
+                lambda m: m.state in ['confirmed', 'waiting', 'partially_available']):
+            for order in self.mapped('order_line'):
+                need = order.product_uom_qty
+                available_quantity = self.env['stock.quant']._get_available_quantity(move.product_id, move.location_id,
+                                                                                     order.product_lot_id)
+                taken_quantity = move._update_reserved_quantity(need=need, available_quantity=available_quantity,
+                                                                location_id=move.location_id,
+                                                                lot_id=order.product_lot_id, strict=False)
+                if need == taken_quantity:
+                    assigned_moves |= move
+                else:
+                    partially_available_moves |= move
+            partially_available_moves.write({'state': 'partially_available'})
+            assigned_moves.write({'state': 'assigned'})
+            self.mapped('picking_ids')._check_entire_pack()
+            self.update({'state': 'assigned'})
+
+    @api.multi
+    def action_picking_done(self):
+        if self.order_line.mapped('move_ids').filtered(
+                lambda m: m.state in ['confirmed', 'waiting', 'partially_available']):
+            raise ValidationError('Asegurese de haber asignado los serial al movimiento.\n'
+                                  'Ejecute el boton "ASIGNAR PRODUCTOS"')
+        for move in self.order_line.mapped('move_ids'):
+            for move_lines in move.mapped('move_line_ids'):
+                move_lines.write({'qty_done': 1})
+        self.validate_picking()
+        self.action_done()
+
+    def _update_line_message(self, subject=None, body=None, **kwargs):
+        for order in self:
+            order_lines = self.mapped('order_line')
+            msg = "<b>" + kwargs.get('subtitle', 'Actualizando') + ".</b><ul>"
+            for line in order_lines:
+                msg += "<li> %s:" % (line.product_id.display_name,)
+                msg += "<br/>" + _("Cantidad registrada") + ": %s -> %s <br/>" % (
+                    line.product_uom_qty, float(body['product_uom_qty']),)
+                if line.product_id.type in ('consu', 'product'):
+                    msg += _("Cantidad entregada") + ": %s <br/>" % (line.qty_delivered,)
+            msg += "</ul>"
+            order.message_post(subject=subject, body=msg)
+
 
 class OctagonoGPSLine(models.Model):
     _name = 'octagono.gps.line'
     _description = 'Octagono Order Line'
     _order = 'sequence, id'
 
-    # =============== sale.order.line ==================
-    order_id = fields.Many2one('octagono.gps', string='Order Reference', required=True, ondelete='cascade', index=True,
-                               copy=False)
-    name = fields.Text(string='Description', required=True)
+    order_id = fields.Many2one('octagono.gps', string='Referencia', required=True, ondelete='cascade', index=True, copy=False)
+    name = fields.Text(string='Descriccion', required=True)
     sequence = fields.Integer(string='Sequence', default=10)
     price_unit = fields.Float('Unit Price', required=True, digits=dp.get_precision('Product Price'), default=0.0)
-
     price_subtotal = fields.Monetary(compute='_compute_amount', string='Subtotal', readonly=True, store=True)
     price_tax = fields.Float(compute='_compute_amount', string='Taxes', readonly=True, store=True)
     price_total = fields.Monetary(compute='_compute_amount', string='Total', readonly=True, store=True)
-
-    price_reduce = fields.Float(compute='_get_price_reduce', string='Price Reduce',
-                                digits=dp.get_precision('Product Price'), readonly=True, store=True)
-    tax_id = fields.Many2many('account.tax', string='Taxes',
-                              domain=['|', ('active', '=', False), ('active', '=', True)])
-    price_reduce_taxinc = fields.Monetary(compute='_get_price_reduce_tax', string='Price Reduce Tax inc', readonly=True,
-                                          store=True)
-    price_reduce_taxexcl = fields.Monetary(compute='_get_price_reduce_notax', string='Price Reduce Tax excl',
-                                           readonly=True, store=True)
-
+    price_reduce = fields.Float(compute='_get_price_reduce', string='Price Reduce', digits=dp.get_precision('Product Price'), readonly=True, store=True)
+    tax_id = fields.Many2many('account.tax', string='Taxes', domain=['|', ('active', '=', False), ('active', '=', True)])
+    price_reduce_taxinc = fields.Monetary(compute='_get_price_reduce_tax', string='Price Reduce Tax inc', readonly=True, store=True)
+    price_reduce_taxexcl = fields.Monetary(compute='_get_price_reduce_notax', string='Price Reduce Tax excl', readonly=True, store=True)
     discount = fields.Float(string='Discount (%)', digits=dp.get_precision('Discount'), default=0.0)
-
-    product_id = fields.Many2one('product.product', string='Product', domain=[('octagono_ok', '=', True)],
-                                 change_default=True, ondelete='restrict', required=True)
-    product_updatable = fields.Boolean(compute='_compute_product_updatable', string='Can Edit Product', readonly=True,
-                                       default=True)
-    product_uom_qty = fields.Float(string='Quantity', digits=dp.get_precision('Product Unit of Measure'), required=True,
-                                   default=1.0)
+    product_id = fields.Many2one('product.product', string='Product', domain=[('octagono_ok', '=', True)], change_default=True, ondelete='restrict', required=True)
+    product_lot_id = fields.Many2one('stock.production.lot', string='Serial del producto', change_default=True, ondelete='restrict', required=True)
+    product_updatable = fields.Boolean(compute='_compute_product_updatable', string='Can Edit Product', readonly=True, default=True)
+    product_uom_qty = fields.Float(string='Quantity', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0)
     product_uom = fields.Many2one('product.uom', string='Unit of Measure', required=True)
     # Non-stored related field to allow portal user to see the image of the product he has ordered
     product_image = fields.Binary('Product Image', related="product_id.image", store=False)
-
-    qty_delivered_updateable = fields.Boolean(compute='_compute_qty_delivered_updateable', string='Can Edit Delivered',
-                                              readonly=True, default=True)
-    qty_delivered = fields.Float(string='Delivered', copy=False, digits=dp.get_precision('Product Unit of Measure'),
-                                 default=0.0)
-
+    qty_delivered_updateable = fields.Boolean(compute='_compute_qty_delivered_updateable', string='Can Edit Delivered', readonly=True, default=True)
+    qty_delivered = fields.Float(string='Delivered', copy=False, digits=dp.get_precision('Product Unit of Measure'), default=0.0)
     salesman_id = fields.Many2one(related='order_id.user_id', store=True, string='Usuario', readonly=True)
     currency_id = fields.Many2one(related='order_id.currency_id', store=True, string='Moneda', readonly=True)
     company_id = fields.Many2one(related='order_id.company_id', string='Company', store=True, readonly=True)
-    order_partner_id = fields.Many2one(related='order_id.partner_id', store=True, string='Customer')
-    is_downpayment = fields.Boolean(string="Is a down payment",
-                                    help="Down payments are made when creating invoices from a sales order."
-                                         " They are not copied when duplicating a sales order.")
-
+    order_partner_id = fields.Many2one(related='order_id.partner_id', store=True, string='Propetario')
+    is_downpayment = fields.Boolean(string="Is a down payment", help="Down payments are made when creating invoices "
+                                                                     "from a sales order. They are not copied when "
+                                                                     "duplicating a sales order.")
     state = fields.Selection([
         ('draft', 'Borrador'),
         ('sent', 'Registro Enviado'),
         ('registered', 'Registrado'),
         ('done', 'Bloqueado'),
+        ('assigned', 'Producto Asignado'),
+        ('valid_product', 'Producto Validado'),
         ('cancel', 'Cancelado'),
     ], related='order_id.state', string='Order Status', readonly=True, copy=False, store=True, default='draft')
-
-    customer_lead = fields.Float(
-        'Delivery Lead Time', required=True, default=0.0,
-        help="Number of days between the order confirmation and the shipping of the products to the customer",
-        oldname="delay")
-    layout_category_id = fields.Many2one('sale.layout_category', string='Section')
-    layout_category_sequence = fields.Integer(string='Layout Sequence')
-
-    # campos inherit.sale.order
+    customer_lead = fields.Float('Delivery Lead Time', required=True, default=0.0, oldname="delay",
+                                 help="Número de días entre la confirmación del pedido y el envío de los productos al cliente")
     product_packaging = fields.Many2one('product.packaging', string='Package', default=False)
-    route_id = fields.Many2one('stock.location.route', string='Route', domain=[('octagono_selectable', '=', True)],
-                               ondelete='restrict')
-    move_ids = fields.One2many('stock.move', 'octagono_line_id', string='Stock Moves')
+    route_id = fields.Many2one('stock.location.route', string='Route', domain=[('octagono_selectable', '=', True)], ondelete='restrict')
+    move_ids = fields.One2many('stock.move', 'octagono_line_id', string='Stock Moves', readonly=True, ondelete='set null', copy=False)
 
-    # =============== sale.order.line ==================
     @api.depends('product_uom_qty', 'discount', 'price_unit', 'tax_id')
     def _compute_amount(self):
         """
@@ -674,7 +658,6 @@ class OctagonoGPSLine(models.Model):
         return line
 
     def _update_line_quantity(self, values):
-        _logger.info('_update_line_quantity %s %s', self._name, values)
         if self.mapped('qty_delivered') and values['product_uom_qty'] < max(self.mapped('qty_delivered')):
             raise UserError('No puede disminuir la cantidad pedida por debajo de la cantidad entregada.\n'
                             'Crea una devolución primero.')
@@ -699,7 +682,6 @@ class OctagonoGPSLine(models.Model):
 
     @api.multi
     def write(self, values):
-        _logger.info('write, %s : %s', self._name, values)
         if 'product_uom_qty' in values:
             precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
             self.filtered(
@@ -726,7 +708,6 @@ class OctagonoGPSLine(models.Model):
                                                                     precision_digits=precision) == -1)
 
             lines._action_launch_procurement_rule()
-            _logger.info('write: %s , %s', self._name, lines)
 
         return super(OctagonoGPSLine, self).write(values)
 
@@ -736,17 +717,15 @@ class OctagonoGPSLine(models.Model):
         de una regla de adquisición procedente de una línea de orden de venta. Este método podría anularse
         para agregar otra clave personalizada que podría ser utilizado en la creación de movimiento / po.
         """
-        _logger.info('_prepare_procurement_values %s , %s', self._name, group_id)
         self.ensure_one()
         date_planned = datetime.strptime(self.order_id.confirmation_date, DEFAULT_SERVER_DATETIME_FORMAT) \
-                       + timedelta(days=self.customer_lead or 0.0) - timedelta(
-            days=self.order_id.company_id.security_lead)
+                       + timedelta(days=self.customer_lead or 0.0)
         values = {
             'company_id': self.order_id.company_id,
             'group_id': group_id,
             'octagono_line_id': self.id,
             'date_planned': date_planned.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
-            'route_ids': self.route_id,
+            'route_ids': self.route_id or self.order_id.warehouse_id.route_ids,
             'warehouse_id': self.order_id.warehouse_id or False,
             'partner_dest_id': self.order_id.partner_shipping_id
         }
@@ -754,9 +733,6 @@ class OctagonoGPSLine(models.Model):
 
     @api.multi
     def _get_display_price(self, product):
-        # TO DO: move me in master/saas-16 on octagono.gps
-        if self.order_id.pricelist_id.discount_policy == 'with_discount':
-            return product.with_context(pricelist=self.order_id.pricelist_id.id).price
         final_price, rule_id = self.order_id.pricelist_id.get_product_price_rule(self.product_id,
                                                                                  self.product_uom_qty or 1.0,
                                                                                  self.order_id.partner_id)
@@ -766,8 +742,8 @@ class OctagonoGPSLine(models.Model):
                                                                                               self.product_uom,
                                                                                               self.order_id.pricelist_id.id)
         if currency_id != self.order_id.pricelist_id.currency_id.id:
-            base_price = self.env['res.currency'].browse(currency_id).with_context(context_partner).compute(base_price,
-                                                                                                            self.order_id.pricelist_id.currency_id)
+            base_price = self.env['res.currency'].browse(currency_id).with_context(context_partner).\
+                compute(base_price, self.order_id.pricelist_id.currency_id)
         # negative discounts (= surcharge) are included in the display price
         return max(base_price, final_price)
 
@@ -793,19 +769,6 @@ class OctagonoGPSLine(models.Model):
         )
 
         result = {'domain': domain}
-
-        title = False
-        message = False
-        warning = {}
-        if product.sale_line_warn != 'no-message':
-            title = _("Warning for %s") % product.name
-            message = product.sale_line_warn_msg
-            warning['title'] = title
-            warning['message'] = message
-            result = {'warning': warning}
-            if product.sale_line_warn == 'block':
-                self.product_id = False
-                return result
 
         name = product.name_get()[0][1]
         if product.description_octagono:
@@ -863,7 +826,8 @@ class OctagonoGPSLine(models.Model):
     def unlink(self):
         if self.filtered(lambda x: x.state in ('registered', 'done')):
             raise UserError(
-                _('You can not remove a sales order line.\nDiscard changes and try setting the quantity to 0.'))
+                _('No puede eliminar una línea de orden de registro.\n'
+                  'Descartar cambios e intentar configurar la cantidad en 0.'))
         return super(OctagonoGPSLine, self).unlink()
 
     @api.multi
@@ -891,11 +855,6 @@ class OctagonoGPSLine(models.Model):
         product_currency = None
         if rule_id:
             pricelist_item = PricelistItem.browse(rule_id)
-            if pricelist_item.pricelist_id.discount_policy == 'without_discount':
-                while pricelist_item.base == 'pricelist' and pricelist_item.base_pricelist_id and pricelist_item.base_pricelist_id.discount_policy == 'without_discount':
-                    price, rule_id = pricelist_item.base_pricelist_id.with_context(uom=uom.id).get_product_price_rule(
-                        product, qty, self.order_id.partner_id)
-                    pricelist_item = PricelistItem.browse(rule_id)
 
             if pricelist_item.base == 'standard_price':
                 field_name = 'standard_price'
@@ -931,11 +890,9 @@ class OctagonoGPSLine(models.Model):
             'tax_id', 'analytic_tag_ids'
         ]
 
-    # funciones inherit.sale.order.line
     @api.onchange('product_id')
     def _onchange_product_id_set_customer_lead(self):
         self.customer_lead = self.product_id.sale_delay
-        _logger.info('_onchange_product_id_set_customer_lead ==> %s', self.customer_lead)
 
     @api.onchange('product_id')
     def _onchange_product_id_uom_check_availability(self):
@@ -952,6 +909,7 @@ class OctagonoGPSLine(models.Model):
             precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
             product = self.product_id.with_context(warehouse=self.order_id.warehouse_id.id)
             product_qty = self.product_uom._compute_quantity(self.product_uom_qty, self.product_id.uom_id)
+
             if float_compare(product.virtual_available, product_qty, precision_digits=precision) == -1:
                 is_available = self._check_routing()
                 if not is_available:
@@ -1077,3 +1035,20 @@ class OctagonoGPSLine(models.Model):
                     break
 
         return is_available
+
+    @api.onchange('product_id')
+    def _onchange_product_id_set_lot_domain(self):
+        available_lot_ids = []
+        if self.order_id.warehouse_id and self.product_id:
+            location = self.order_id.warehouse_id.lot_stock_id
+            quants = self.env['stock.quant'].read_group([
+                ('product_id', '=', self.product_id.id),
+                ('location_id', 'child_of', location.id),
+                ('quantity', '>', 0),
+                ('lot_id', '!=', False),
+            ], ['lot_id'], 'lot_id')
+            available_lot_ids = [quant['lot_id'][0] for quant in quants]
+        self.product_lot_id = False
+        return {
+            'domain': {'product_lot_id': [('id', 'in', available_lot_ids)]}
+        }
