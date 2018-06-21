@@ -1058,7 +1058,7 @@ class OctagonoGPSLine(models.Model):
 
 class OctagonoGPSTags(models.Model):
     _name = 'octagono.gps.tags'
-    _description = 'Octagono GPS Tagas'
+    _description = 'Octagono GPS Tags'
 
     name = fields.Char(required=True, translate=True)
     color = fields.Integer('Color Index', default=10)
