@@ -21,6 +21,8 @@ class OctagonoModel(models.Model):
     image_medium = fields.Binary(related='brand_id.image_medium', string="Logo (medium)")
     image_small = fields.Binary(related='brand_id.image_small', string="Logo (small)")
 
+    _sql_constraints = [('name_uniq', 'unique (name)', "Nombre del modelo ya existe !")]
+
     @api.multi
     @api.depends('name', 'brand_id')
     def name_get(self):
@@ -81,6 +83,8 @@ class OctagonoModelBrand(models.Model):
         help="Small-sized logo of the brand. It is automatically "
              "resized as a 64x64px image, with aspect ratio preserved. "
              "Use this field anywhere a small image is required.")
+
+    _sql_constraints = [('name_uniq', 'unique (name)', "Nombre de la marca ya existe !")]
 
     @api.onchange('name')
     def change_name(self):
