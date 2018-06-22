@@ -6,8 +6,8 @@
     Description the module.
     """,
     'version': "1.0",
-    'category': "",
-    'depends': ['sales_team', 'account', 'portal', 'hr', 'stock'],
+    'category': "Human Resources",
+    'depends': ['base', 'mail', 'account', 'portal', 'hr', 'stock'],
     'data': [
         'security/octagono_gps_groups.xml',
         'security/ir.model.access.csv',
@@ -16,8 +16,10 @@
         'views/product_views.xml',
         'views/res_partner_views.xml',
         'views/stock_views.xml',
+        'data/gps_cars_data.xml',
+        'data/gps_data.xml',
     ],
-    'demp': [],
+    'demo': [],
     'application': True,
     'installable': True,
 }
