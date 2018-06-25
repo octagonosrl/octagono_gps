@@ -34,7 +34,7 @@ class ProductTemplate(models.Model):
         }
 
     octagono_count = fields.Integer(compute='_octagono_count', string='# Vehiculos')
-    octagono_ok = fields.Boolean(string='Puede ser tratado en octagono gps', default=False)
+    octagono_ok = fields.Boolean(string='Puede ser tratado en GPS', default=False)
 
     description_octagono = fields.Text(
         'Octagono Description', translate=True,

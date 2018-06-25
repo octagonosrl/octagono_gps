@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="colors_azul" model="octagono.gps.colors">
+        <field name="name">Azul</field>
+    </record>
+    <record id="colors_rojo" model="octagono.gps.colors">
+        <field name="name">Rojo</field>
+    </record>
+    <record id="colors_naranja" model="octagono.gps.colors">
+        <field name="name">Naranja</field>
+    </record>
+    <record id="colors_mamey" model="octagono.gps.colors">
+        <field name="name">Mamey</field>
+    </record>
+    <record id="colors_marron" model="octagono.gps.colors">
+        <field name="name">Marron</field>
+    </record>
+    <record id="colors_plateado" model="octagono.gps.colors">
+        <field name="name">Plateado</field>
+    </record>
+    <record id="colors_blanco" model="octagono.gps.colors">
+        <field name="name">Blanco</field>
+    </record>
+    <record id="colors_negro" model="octagono.gps.colors">
+        <field name="name">negro</field>
+    </record>
+    <record id="colors_rosado" model="octagono.gps.colors">
+        <field name="name">Rosado</field>
+    </record>
+    <record id="colors_amarillo" model="octagono.gps.colors">
+        <field name="name">Amarillo</field>
+    </record>
+    <record id="colors_verde" model="octagono.gps.colors">
+        <field name="name">Verde</field>
+    </record>
+    <record id="colors_gris" model="octagono.gps.colors">
+        <field name="name">Gris</field>
+    </record>
+    <record id="colors_lima" model="octagono.gps.colors">
+        <field name="name">Lima</field>
+    </record>
+    <record id="colors_lavanda" model="octagono.gps.colors">
+        <field name="name">Lavanda</field>
+    </record>
+    <record id="colors_aceituna" model="octagono.gps.colors">
+        <field name="name">Aceituna</field>
+    </record>
+    <record id="colors_dorado" model="octagono.gps.colors">
+        <field name="name">Dorado</field>
+    </record>
+    <record id="colors_magenta" model="octagono.gps.colors">
+        <field name="name">Magenta</field>
+    </record>
+</odoo>

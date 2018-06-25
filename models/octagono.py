@@ -72,9 +72,7 @@ class OctagonoGPS(models.Model):
                                         help="Date on which the sales order is confirmed.", oldname="date_confirm")
     user_id = fields.Many2one('res.users', string='Usuario', index=True, track_visibility='onchange',
                               default=lambda self: self.env.user)
-    partner_id = fields.Many2one('res.partner', string='Propetario', readonly=True,
-                                 states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, required=True,
-                                 change_default=True, index=True, track_visibility='always')
+    partner_id = fields.Many2one('res.partner', string='Propetario', required=True, change_default=True, index=True, track_visibility='always')
     partner_invoice_id = fields.Many2one('res.partner', string='Invoice Address', readonly=True, required=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Invoice address for current sales order.")
     partner_shipping_id = fields.Many2one('res.partner', string='Dirección de entrega', readonly=True, required=True,  states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Delivery address for current sales order.")
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist', required=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Pricelist for current sales order.")
@@ -89,7 +87,7 @@ class OctagonoGPS(models.Model):
     # Campo relacionados a vehiculos
     active = fields.Boolean(default=True, track_visibility="onchange")
     blocking_type = fields.Selection(selection=[('b0', 'B0'), ('b1', 'B1'), ('b2', 'B2'), ('b3', 'B3')], default='b0', string="Tipo de bloqueo")
-    color = fields.Selection(selection='gen_colors')
+    color = fields.Many2one('octagono.gps.colors')
     driver = fields.Char('Responsable o Conductor')
     image = fields.Binary(related='model_id.image', string="Logo")
     image_medium = fields.Binary(related='model_id.image_medium', string="Logo (medium)")
@@ -120,6 +118,7 @@ class OctagonoGPS(models.Model):
     is_waiting = fields.Boolean(compute="_compute_is_waiting")
     is_assign = fields.Boolean(compute="_compute_is_assign")
     p_installation = fields.Many2many('octagono.gps.tags', 'octagono_gps_tags_rel', string="P. Instalacion")
+    select_period = fields.Selection([('monthly', 'Mensual'), ('annual', 'Anual')], index=True, default='monthly')
 
     def _compute_is_expired(self):
         now = datetime.now()
@@ -383,7 +382,8 @@ class OctagonoGPS(models.Model):
 
     @api.model
     def gen_colors(self):
-        return [('rojo', 'Rojo'), ('azul', 'Azul'), ('amarillo', 'Amarillo'), ('verde', 'Verde'), ('blanco', 'Blanco')]
+        return [('rojo', 'Rojo'), ('azul', 'Azul'), ('amarillo', 'Amarillo'), ('verde', 'Verde'), ('blanco', 'Blanco'),
+                ('naranja', 'Naranja'), ('purpura', 'Purpura')]
 
     @api.model
     def gen_date_select(self):
@@ -482,10 +482,14 @@ class OctagonoGPS(models.Model):
         partially_available_moves = self.env['stock.move']
         for move in self.order_line.mapped('move_ids').filtered(
                 lambda m: m.state in ['confirmed', 'waiting', 'partially_available']):
+            _logger.info('===> move ===> %s', move)
             for order in self.mapped('order_line'):
                 need = order.product_uom_qty
                 available_quantity = self.env['stock.quant']._get_available_quantity(move.product_id, move.location_id,
                                                                                      order.product_lot_id)
+                # ==== pruebas ====
+                # move._prepare_move_line_vals(quantity=need, reserved_quant=move)
+                # =================
                 taken_quantity = move._update_reserved_quantity(need=need, available_quantity=available_quantity,
                                                                 location_id=move.location_id,
                                                                 lot_id=order.product_lot_id, strict=False)
@@ -1064,3 +1068,20 @@ class OctagonoGPSTags(models.Model):
     color = fields.Integer('Color Index', default=10)
 
     _sql_constraints = [('name_uniq', 'unique (name)', "Tag name already exists !")]
+
+
+class OctagonoGPSColors(models.Model):
+    _name = 'octagono.gps.colors'
+    _description = 'Octagono GPS Colors'
+    _order = 'name asc'
+
+    name = fields.Char(required=True, translate=True)
+    color = fields.Integer('Color Index', default=10)
+
+    _sql_constraints = [('name_uniq', 'unique (name)', "Tag name already exists !")]
+
+    @api.onchange('name')
+    def change_driver(self):
+        if self.name:
+            self.name = self.name.title()
+

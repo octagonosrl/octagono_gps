@@ -18,6 +18,7 @@
         'views/stock_views.xml',
         'data/gps_cars_data.xml',
         'data/gps_data.xml',
+        'data/gps_colors_data.xml',
     ],
     'demo': [],
     'application': True,

@@ -122,6 +122,7 @@
                     <group>
                         <group>
                             <field name="partner_id" domain="[('customer','=',True)]" context="{'search_default_customer':1, 'show_address': 1}" options='{"always_reload": True}'/>
+                            <!--<field name="partner_id" domain="[('customer','=',True)]" context="{'search_default_customer':1, 'show_address': 1}"/>-->
                             <field name="partner_invoice_id" groups="octagono_gps.group_octagono_gps_manager" context="{'default_type':'invoice'}" options='{"always_reload": True}' invisible="1"/>
                             <field name="partner_shipping_id" groups="octagono_gps.group_octagono_gps_manager" context="{'default_type':'delivery'}" options='{"always_reload": True}' invisible="1"/>
                         </group>
@@ -218,30 +219,25 @@
                         <page string="Datos del vehiculo">
                             <group col="2" string="Caracteristicas">
                                 <group>
-                                    <field name="model_id"
-                                           attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
-                                    <field name="model_year"
-                                           attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
-                                    <field name="vin_sn"
-                                           attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
+                                    <field name="model_id"/>
+                                    <field name="model_year"/>
+                                    <field name="vin_sn"/>
                                 </group>
                                 <group>
-                                    <field name="license_plate"
-                                           attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
-                                    <field name="color" attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
+                                    <field name="license_plate"/>
+                                    <field name="color" options="{'color_field': 'color'}"/>
                                 </group>
                             </group>
                         </page>
                         <page string="Datos de la instalacion">
                             <group col="2">
                                 <group>
-                                    <field name="install_date"
-                                           attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
-                                    <field name="installer_id" options="{'no_create': True}"
-                                           attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
+                                    <field name="install_date"/>
+                                    <field name="installer_id" options="{'no_create': True}"/>
                                 </group>
                                 <group>
-                                    <field name="blocking_type" attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
+                                    <field name="select_period" string="Ciclo" widget="selection"/>
+                                    <field name="blocking_type"/>
                                     <field name="p_installation" widget="many2many_tags" options="{'color_field': 'color'}"/>
                                 </group>
                             </group>
@@ -445,5 +441,33 @@
 
     <!-- Octagono GPS Tag menu item -->
     <menuitem id="menu_octagono_gps_tags" action="action_octagono_gps_tags" parent="menu_octagono_config" sequence="2"/>
+
+    <!-- Octagono GPS Tag tree view -->
+    <record id="view_octagono_gps_colors_form" model="ir.ui.view">
+        <field name="name">octagono.gps.colors.tree</field>
+        <field name="model">octagono.gps.colors</field>
+        <field name="arch" type="xml">
+            <form string="VColores">
+                <group>
+                    <field name="name"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- Octagono GPS Tag action view -->
+    <record id="action_octagono_gps_colors" model="ir.actions.act_window">
+        <field name="name">Lista de Colores</field>
+        <field name="res_model">octagono.gps.colors</field>
+        <field name="view_type">form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click para agregar un nuevo color.
+            </p>
+        </field>
+    </record>
+
+    <!-- Octagono GPS Tag menu item -->
+    <menuitem id="menu_octagono_gps_colors" action="action_octagono_gps_colors" parent="menu_octagono_config" sequence="3"/>
 
 </odoo>
