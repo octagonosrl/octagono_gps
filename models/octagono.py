@@ -120,6 +120,7 @@ class OctagonoGPS(models.Model):
     is_waiting = fields.Boolean(compute="_compute_is_waiting")
     is_assign = fields.Boolean(compute="_compute_is_assign")
     p_installation = fields.Many2many('octagono.gps.tags', 'octagono_gps_tags_rel', string="P. Instalacion")
+    select_period = fields.Selection([('monthly', 'Mensual'), ('annual', 'Anual')], index=True, default='monthly')
 
     def _compute_is_expired(self):
         now = datetime.now()

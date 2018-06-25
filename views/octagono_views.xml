@@ -218,31 +218,26 @@
                         <page string="Datos del vehiculo">
                             <group col="2" string="Caracteristicas">
                                 <group>
-                                    <field name="model_id"
-                                           attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
-                                    <field name="model_year"
-                                           attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
-                                    <field name="vin_sn"
-                                           attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
+                                    <field name="model_id"/>
+                                    <field name="model_year"/>
+                                    <field name="vin_sn"/>
                                 </group>
                                 <group>
-                                    <field name="license_plate"
-                                           attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
-                                    <field name="color" attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
+                                    <field name="license_plate"/>
+                                    <field name="color"/>
                                 </group>
                             </group>
                         </page>
                         <page string="Datos de la instalacion">
                             <group col="2">
                                 <group>
-                                    <field name="install_date"
-                                           attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
-                                    <field name="installer_id" options="{'no_create': True}"
-                                           attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
+                                    <field name="install_date"/>
+                                    <field name="installer_id" options="{'no_create': True}"/>
                                 </group>
                                 <group>
-                                    <field name="blocking_type" attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
-                                    <field name="p_installation" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                    <field name="select_period" string="Ciclo" widget="selection"/>
+                                    <field name="blocking_type"/>
+                                    <field name="p_installation"/>
                                 </group>
                             </group>
                         </page>
