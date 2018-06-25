@@ -22,8 +22,9 @@
             <xpath expr="//button[@name='toggle_active']" position="before">
                 <button name="%(octagono_gps.action_product_octagono_list)d" type="action"
                     icon="fas fa-car" class="oe_stat_button"
-                    attrs="{'invisible': [('octagono_count', '&lt;=', 1)]}">
+                    attrs="{'invisible': ['|', ('octagono_count', '&lt;=', 1), ('octagono_ok', '=', False)]}">
                     <field string="Vehiculos" name="octagono_count" widget="statinfo" />
+                    <field name="octagono_ok" invisible="1"/>
                 </button>
             </xpath>
         </field>
@@ -35,7 +36,7 @@
         <field name="inherit_id" ref="product.product_template_search_view"/>
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='filter_to_purchase']" position="after">
-                <filter string="Puede ser tratado en octagono gps" name="filter_to_octagono" domain="[('octagono_ok', '=', 1)]"/>
+                <filter string="Puede ser tratado en GPS" name="filter_to_octagono" domain="[('octagono_ok', '=', 1)]"/>
             </xpath>
         </field>
     </record>

@@ -17,4 +17,4 @@ class ProductProduct(models.Model):
                 octagono_gps_line.filtered(lambda r: r.product_id == product).mapped('order_id'))
 
     octagono_count = fields.Integer(compute='_octagono_count', string='# Vehiculos')
-    octagono_ok = fields.Boolean('Puede ser tratado en octagono gps', related="product_tmpl_id.octagono_ok")
+    octagono_ok = fields.Boolean('Puede ser tratado en GPS', related="product_tmpl_id.octagono_ok")
