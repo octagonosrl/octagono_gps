@@ -78,7 +78,7 @@ class OctagonoGPS(models.Model):
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist', required=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Pricelist for current sales order.")
     currency_id = fields.Many2one("res.currency", related='pricelist_id.currency_id', string="Currency", readonly=True, required=True)
     order_line = fields.One2many('octagono.gps.line', 'order_id', string='Order Lines', states={'cancel': [('readonly', True)], 'done': [('readonly', True)]}, copy=True, auto_join=True)
-    note = fields.Text('Nota', default=_default_note)
+    note = fields.Text('Nota', default=_default_note, track_visibility="onchange")
     payment_term_id = fields.Many2one('account.payment.term', string='Payment Terms', oldname='payment_term')
     fiscal_position_id = fields.Many2one('account.fiscal.position', oldname='fiscal_position', string='Fiscal Position')
     company_id = fields.Many2one('res.company', 'Empresa', default=lambda self: self.env['res.company']._company_default_get('octagono.gps'))
@@ -87,38 +87,38 @@ class OctagonoGPS(models.Model):
     # Campo relacionados a vehiculos
     active = fields.Boolean(default=True, track_visibility="onchange")
     blocking_type = fields.Selection(selection=[('b0', 'B0'), ('b1', 'B1'), ('b2', 'B2'), ('b3', 'B3')], default='b0', string="Tipo de bloqueo")
-    color = fields.Many2one('octagono.gps.colors')
-    driver = fields.Char('Responsable o Conductor')
+    color = fields.Many2one('octagono.gps.colors', track_visibility="onchange")
+    driver = fields.Char('Responsable o Conductor', track_visibility="onchange")
     image = fields.Binary(related='model_id.image', string="Logo")
     image_medium = fields.Binary(related='model_id.image_medium', string="Logo (medium)")
     image_small = fields.Binary(related='model_id.image_small', string="Logo (small)")
     license_plate = fields.Char('Matricula', required=True, track_visibility='onchange', help="Numero de matriculo o "
                                                                                               "placa del vehiculo")
-    install_date = fields.Datetime(required=True, index=True, default=lambda self: fields.Datetime.now())
-    installer_id = fields.Many2one('hr.employee', "Instalador", domain="[('department_id.name', 'in', ['Operaciones', 'operaciones'])]", required=True)
-    model_id = fields.Many2one('octagono.model', "Modelo", required=True, help="Model of the vehicle")
-    model_year = fields.Selection(selection='gen_date_select', string="Año del modelo", required=True)
-    vin_sn = fields.Char("Num. Chasis", required=True)
+    install_date = fields.Datetime(required=True, index=True, default=lambda self: fields.Datetime.now(), track_visibility="onchange")
+    installer_id = fields.Many2one('hr.employee', "Instalador", domain="[('department_id.name', 'in', ['Operaciones', 'operaciones'])]", required=True, track_visibility="onchange")
+    model_id = fields.Many2one('octagono.model', "Modelo", required=True, help="Model of the vehicle", track_visibility="onchange")
+    model_year = fields.Selection(selection='gen_date_select', string="Año del modelo", required=True, track_visibility="onchange")
+    vin_sn = fields.Char("Num. Chasis", required=True, track_visibility="onchange")
     incoterm = fields.Many2one(
         'stock.incoterms', 'Incoterms',
         help="International Commercial Terms are a series of predefined "
-             "commercial terms used in international transactions.")
+             "commercial terms used in international transactions.", track_visibility="onchange")
     picking_policy = fields.Selection([
         ('direct', 'Entregar cada producto cuando esté disponible'),
         ('one', 'Entregar todos los productos a la vez')],
         string='Shipping Policy', required=True, readonly=True, default='direct',
-        states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
+        states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, track_visibility="onchange")
     warehouse_id = fields.Many2one(
         'stock.warehouse', string='Warehouse',
         required=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
-        default=_default_warehouse_id)
+        default=_default_warehouse_id, track_visibility="onchange")
     picking_ids = fields.One2many('stock.picking', 'octagono_id', string='Pickings')
     delivery_count = fields.Integer(string='Delivery Orders', compute='_compute_picking_ids')
     procurement_group_id = fields.Many2one('procurement.group', 'Procurement Group', copy=False)
     is_waiting = fields.Boolean(compute="_compute_is_waiting")
     is_assign = fields.Boolean(compute="_compute_is_assign")
     p_installation = fields.Many2many('octagono.gps.tags', 'octagono_gps_tags_rel', string="P. Instalacion")
-    select_period = fields.Selection([('monthly', 'Mensual'), ('annual', 'Anual')], index=True, default='monthly')
+    select_period = fields.Selection([('monthly', 'Mensual'), ('annual', 'Anual')], index=True, default='monthly', track_visibility="onchange")
 
     def _compute_is_expired(self):
         now = datetime.now()
