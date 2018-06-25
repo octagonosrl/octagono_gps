@@ -438,7 +438,7 @@
         </field>
     </record>
 
-    <!-- Octagono GPS Tag menu item -->
+    <!-- Octagono GPS Tag menu item  -->
     <menuitem id="menu_octagono_gps_tags" action="action_octagono_gps_tags" parent="menu_octagono_config" sequence="2"/>
 
 </odoo>
