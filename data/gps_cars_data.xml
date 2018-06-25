@@ -84,10 +84,10 @@
       	<field name="name">Holden</field>
       	<field name="image" type="base64" file="octagono_gps/static/img/brand_holden-image.png"/>
       </record>
-      <!--<record id="brand_honda" model="octagono.model.brand">-->
-      	<!--<field name="name">Honda</field>-->
-      	<!--<field name="image" type="base64" file="octagono_gps/static/img/brand_honda-image.png"/>-->
-      <!--</record>-->
+      <record id="brand_honda" model="octagono.model.brand">
+      	<field name="name">Honda</field>
+      	<field name="image" type="base64" file="octagono_gps/static/img/brand_honda-image.png"/>
+      </record>
       <record id="brand_hyundai" model="octagono.model.brand">
       	<field name="name">Hyundai</field>
       	<field name="image" type="base64" file="octagono_gps/static/img/brand_hyundai-image.png"/>
@@ -240,10 +240,10 @@
       	<field name="name">Tesla Motors</field>
       	<field name="image" type="base64" file="octagono_gps/static/img/brand_tesla-motors-image.png"/>
       </record>
-      <!--<record id="brand_toyota" model="octagono.model.brand">-->
-      	<!--<field name="name">Toyota</field>-->
-      	<!--<field name="image" type="base64" file="octagono_gps/static/img/brand_toyota-image.png"/>-->
-      <!--</record>-->
+      <record id="brand_toyota" model="octagono.model.brand">
+      	<field name="name">Toyota</field>
+      	<field name="image" type="base64" file="octagono_gps/static/img/brand_toyota-image.png"/>
+      </record>
       <record id="brand_trabant" model="octagono.model.brand">
       	<field name="name">Trabant</field>
       	<field name="image" type="base64" file="octagono_gps/static/img/brand_trabant-image.png"/>
