@@ -122,7 +122,6 @@
                     <group>
                         <group>
                             <field name="partner_id" domain="[('customer','=',True)]" context="{'search_default_customer':1, 'show_address': 1}" options='{"always_reload": True}'/>
-                            <!--<field name="partner_id" domain="[('customer','=',True)]" context="{'search_default_customer':1, 'show_address': 1}"/>-->
                             <field name="partner_invoice_id" groups="octagono_gps.group_octagono_gps_manager" context="{'default_type':'invoice'}" options='{"always_reload": True}' invisible="1"/>
                             <field name="partner_shipping_id" groups="octagono_gps.group_octagono_gps_manager" context="{'default_type':'delivery'}" options='{"always_reload": True}' invisible="1"/>
                         </group>
@@ -225,7 +224,7 @@
                                 </group>
                                 <group>
                                     <field name="license_plate"/>
-                                    <field name="color" options="{'color_field': 'color'}"/>
+                                    <field name="color"/>
                                 </group>
                             </group>
                         </page>
@@ -441,33 +440,5 @@
 
     <!-- Octagono GPS Tag menu item -->
     <menuitem id="menu_octagono_gps_tags" action="action_octagono_gps_tags" parent="menu_octagono_config" sequence="2"/>
-
-    <!-- Octagono GPS Tag tree view -->
-    <record id="view_octagono_gps_colors_form" model="ir.ui.view">
-        <field name="name">octagono.gps.colors.tree</field>
-        <field name="model">octagono.gps.colors</field>
-        <field name="arch" type="xml">
-            <form string="Colores">
-                <group>
-                    <field name="name"/>
-                </group>
-            </form>
-        </field>
-    </record>
-
-    <!-- Octagono GPS Tag action view -->
-    <record id="action_octagono_gps_colors" model="ir.actions.act_window">
-        <field name="name">Lista de Colores</field>
-        <field name="res_model">octagono.gps.colors</field>
-        <field name="view_type">form</field>
-        <field name="help" type="html">
-            <p class="oe_view_nocontent_create">
-                Click para agregar un nuevo color.
-            </p>
-        </field>
-    </record>
-
-    <!-- Octagono GPS Tag menu item -->
-    <menuitem id="menu_octagono_gps_colors" action="action_octagono_gps_colors" parent="menu_octagono_config" sequence="3"/>
 
 </odoo>
