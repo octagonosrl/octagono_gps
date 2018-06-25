@@ -447,7 +447,7 @@
         <field name="name">octagono.gps.colors.tree</field>
         <field name="model">octagono.gps.colors</field>
         <field name="arch" type="xml">
-            <form string="VColores">
+            <form string="Colores">
                 <group>
                     <field name="name"/>
                 </group>
