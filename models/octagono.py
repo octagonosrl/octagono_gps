@@ -21,8 +21,7 @@ class OctagonoGPS(models.Model):
     _description = "GPS"
     _order = 'date_order desc, id desc'
     _sql_constraints = [
-        ('octagono_gps_vin_sn_unique', 'unique(vin_sn)', 'La numeracion del chasis ya existe.'),
-        ('octagono_gps_license_plate_unique', 'unique(license_plate)', 'La numeracion de la matriculo o placa existe.'),
+        ('octagono_gps_vin_sn_unique', 'unique(vin_sn)', 'La numeracion del chasis ya existe.')
     ]
 
     @api.model
@@ -57,7 +56,7 @@ class OctagonoGPS(models.Model):
         ('draft', 'Borrador'),
         ('sent', 'Registro Enviado'),
         ('registered', 'Registrado'),
-        ('done', 'Bloqueado'),
+        ('done', 'Asignado'),
         ('assigned', 'Producto Asignado'),
         ('valid_product', 'Producto Validado'),
         ('cancel', 'Cancelado'),
@@ -73,6 +72,7 @@ class OctagonoGPS(models.Model):
     user_id = fields.Many2one('res.users', string='Usuario', index=True, track_visibility='onchange',
                               default=lambda self: self.env.user)
     partner_id = fields.Many2one('res.partner', string='Propetario', required=True, change_default=True, index=True, track_visibility='always')
+    partner_name = fields.Char(related='partner_id.name')
     partner_invoice_id = fields.Many2one('res.partner', string='Invoice Address', readonly=True, required=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Invoice address for current sales order.")
     partner_shipping_id = fields.Many2one('res.partner', string='Dirección de entrega', readonly=True, required=True,  states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Delivery address for current sales order.")
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist', required=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Pricelist for current sales order.")
@@ -92,13 +92,12 @@ class OctagonoGPS(models.Model):
     image = fields.Binary(related='model_id.image', string="Logo")
     image_medium = fields.Binary(related='model_id.image_medium', string="Logo (medium)")
     image_small = fields.Binary(related='model_id.image_small', string="Logo (small)")
-    license_plate = fields.Char('Matricula', required=True, track_visibility='onchange', help="Numero de matriculo o "
-                                                                                              "placa del vehiculo")
-    install_date = fields.Datetime(required=True, index=True, default=lambda self: fields.Datetime.now(), track_visibility="onchange")
-    installer_id = fields.Many2one('hr.employee', "Instalador", domain="[('department_id.name', 'in', ['Operaciones', 'operaciones'])]", required=True, track_visibility="onchange")
-    model_id = fields.Many2one('octagono.model', "Modelo", required=True, help="Model of the vehicle", track_visibility="onchange")
-    model_year = fields.Selection(selection='gen_date_select', string="Año del modelo", required=True, track_visibility="onchange")
-    vin_sn = fields.Char("Num. Chasis", required=True, track_visibility="onchange")
+    license_plate = fields.Char('Matricula', track_visibility='onchange', help="Numero de matriculo o placa del vehiculo")
+    install_date = fields.Datetime(index=True, default=lambda self: fields.Datetime.now(), track_visibility="onchange")
+    installer_id = fields.Many2one('hr.employee', "Instalador", domain="[('department_id.name', 'in', ['Operaciones', 'operaciones'])]", track_visibility="onchange")
+    model_id = fields.Many2one('octagono.model', "Modelo", help="Model of the vehicle", track_visibility="onchange")
+    model_year = fields.Selection(selection='gen_date_select', string="Año del modelo", track_visibility="onchange")
+    vin_sn = fields.Char("Num. Chasis", track_visibility="onchange")
     incoterm = fields.Many2one(
         'stock.incoterms', 'Incoterms',
         help="International Commercial Terms are a series of predefined "
@@ -108,10 +107,7 @@ class OctagonoGPS(models.Model):
         ('one', 'Entregar todos los productos a la vez')],
         string='Shipping Policy', required=True, readonly=True, default='direct',
         states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, track_visibility="onchange")
-    warehouse_id = fields.Many2one(
-        'stock.warehouse', string='Warehouse',
-        required=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
-        default=_default_warehouse_id, track_visibility="onchange")
+    warehouse_id = fields.Many2one('stock.warehouse', string='Warehouse', required=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, default=_default_warehouse_id, track_visibility="onchange")
     picking_ids = fields.One2many('stock.picking', 'octagono_id', string='Pickings')
     delivery_count = fields.Integer(string='Delivery Orders', compute='_compute_picking_ids')
     procurement_group_id = fields.Many2one('procurement.group', 'Procurement Group', copy=False)
@@ -269,53 +265,53 @@ class OctagonoGPS(models.Model):
         return self.write({'state': 'cancel'})
 
     # Observacion
-    @api.multi
-    def action_quotation_send(self):
-        """
-        This function opens a window to compose an email, with the edi sale template message loaded by default
-        """
-        self.ensure_one()
-        ir_model_data = self.env['ir.model.data']
-        try:
-            template_id = ir_model_data.get_object_reference('sale', 'email_template_edi_sale')[1]
-        except ValueError:
-            template_id = False
-        try:
-            compose_form_id = ir_model_data.get_object_reference('mail', 'email_compose_message_wizard_form')[1]
-        except ValueError:
-            compose_form_id = False
-        ctx = {
-            'default_model': 'octagono.gps',
-            'default_res_id': self.ids[0],
-            'default_use_template': bool(template_id),
-            'default_template_id': template_id,
-            'default_composition_mode': 'comment',
-            'mark_so_as_sent': True,
-            'custom_layout': "sale.mail_template_data_notification_email_sale_order",
-            'proforma': self.env.context.get('proforma', False),
-            'force_email': True
-        }
-        return {
-            'type': 'ir.actions.act_window',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'mail.compose.message',
-            'views': [(compose_form_id, 'form')],
-            'view_id': compose_form_id,
-            'target': 'new',
-            'context': ctx,
-        }
+    # @api.multi
+    # def action_quotation_send(self):
+    #     """
+    #     This function opens a window to compose an email, with the edi sale template message loaded by default
+    #     """
+    #     self.ensure_one()
+    #     ir_model_data = self.env['ir.model.data']
+    #     try:
+    #         template_id = ir_model_data.get_object_reference('sale', 'email_template_edi_sale')[1]
+    #     except ValueError:
+    #         template_id = False
+    #     try:
+    #         compose_form_id = ir_model_data.get_object_reference('mail', 'email_compose_message_wizard_form')[1]
+    #     except ValueError:
+    #         compose_form_id = False
+    #     ctx = {
+    #         'default_model': 'octagono.gps',
+    #         'default_res_id': self.ids[0],
+    #         'default_use_template': bool(template_id),
+    #         'default_template_id': template_id,
+    #         'default_composition_mode': 'comment',
+    #         'mark_so_as_sent': True,
+    #         'custom_layout': "sale.mail_template_data_notification_email_sale_order",
+    #         'proforma': self.env.context.get('proforma', False),
+    #         'force_email': True
+    #     }
+    #     return {
+    #         'type': 'ir.actions.act_window',
+    #         'view_type': 'form',
+    #         'view_mode': 'form',
+    #         'res_model': 'mail.compose.message',
+    #         'views': [(compose_form_id, 'form')],
+    #         'view_id': compose_form_id,
+    #         'target': 'new',
+    #         'context': ctx,
+    #     }
 
     # observacion
-    @api.multi
-    def force_quotation_send(self):
-        for order in self:
-            email_act = order.action_quotation_send()
-            if email_act and email_act.get('context'):
-                email_ctx = email_act['context']
-                email_ctx.update(default_email_from=order.company_id.email)
-                order.with_context(email_ctx).message_post_with_template(email_ctx.get('default_template_id'))
-        return True
+    # @api.multi
+    # def force_quotation_send(self):
+    #     for order in self:
+    #         email_act = order.action_quotation_send()
+    #         if email_act and email_act.get('context'):
+    #             email_ctx = email_act['context']
+    #             email_ctx.update(default_email_from=order.company_id.email)
+    #             order.with_context(email_ctx).message_post_with_template(email_ctx.get('default_template_id'))
+    #     return True
 
     @api.multi
     def action_done(self):
@@ -333,8 +329,8 @@ class OctagonoGPS(models.Model):
             'state': 'registered',
             'confirmation_date': fields.Datetime.now()
         })
-        if self.env.context.get('send_email'):
-            self.force_quotation_send()
+        # if self.env.context.get('send_email'):
+        #     self.force_quotation_send()
 
         for order in self:
             order.order_line._action_launch_procurement_rule()
@@ -379,11 +375,6 @@ class OctagonoGPS(models.Model):
                 group_data['has_button_access'] = True
 
         return groups
-
-    @api.model
-    def gen_colors(self):
-        return [('rojo', 'Rojo'), ('azul', 'Azul'), ('amarillo', 'Amarillo'), ('verde', 'Verde'), ('blanco', 'Blanco'),
-                ('naranja', 'Naranja'), ('purpura', 'Purpura')]
 
     @api.model
     def gen_date_select(self):
@@ -482,14 +473,10 @@ class OctagonoGPS(models.Model):
         partially_available_moves = self.env['stock.move']
         for move in self.order_line.mapped('move_ids').filtered(
                 lambda m: m.state in ['confirmed', 'waiting', 'partially_available']):
-            _logger.info('===> move ===> %s', move)
             for order in self.mapped('order_line'):
                 need = order.product_uom_qty
                 available_quantity = self.env['stock.quant']._get_available_quantity(move.product_id, move.location_id,
                                                                                      order.product_lot_id)
-                # ==== pruebas ====
-                # move._prepare_move_line_vals(quantity=need, reserved_quant=move)
-                # =================
                 taken_quantity = move._update_reserved_quantity(need=need, available_quantity=available_quantity,
                                                                 location_id=move.location_id,
                                                                 lot_id=order.product_lot_id, strict=False)
@@ -565,7 +552,7 @@ class OctagonoGPSLine(models.Model):
         ('draft', 'Borrador'),
         ('sent', 'Registro Enviado'),
         ('registered', 'Registrado'),
-        ('done', 'Bloqueado'),
+        ('done', 'Asignado'),
         ('assigned', 'Producto Asignado'),
         ('valid_product', 'Producto Validado'),
         ('cancel', 'Cancelado'),
@@ -703,7 +690,7 @@ class OctagonoGPSLine(models.Model):
                 ('name', 'in', protected_fields_modified), ('model', '=', self._name)
             ])
             raise UserError(
-                _('Está prohibido modificar los siguientes campos en un registro bloqueado:\n%s')
+                _('Está prohibido modificar los siguientes campos en un registro Asignado:\n%s')
                 % '\n'.join(fields.mapped('field_description'))
             )
 
