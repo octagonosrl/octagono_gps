@@ -141,7 +141,7 @@
                                     <field name="sequence" widget="handle"/>
                                     <field name="product_updatable" invisible="1"/>
                                     <field name="product_id" attrs="{'readonly': [('product_updatable', '=', False)]}" force_save="1" context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}"/>
-                                    <field name="product_lot_id" domain="[('product_id','=', product_id)]" context="{'default_product_id': product_id}" groups="stock.group_production_lot" options='{"no_create": True}'/>
+                                    <field name="product_lot_id" domain="[('product_id','=', product_id)]" context="{'default_product_id': product_id}" attrs="{'readonly': [('product_updatable', '=', False), ('state', 'in', ('registered','done', 'cancel'))]}" groups="stock.group_production_lot" options='{"no_create": True}'/>
                                     <field name="name"/>
                                     <field name="product_uom_qty" string="Ordered Qty" context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}" invisible="1"/>
                                     <field name="product_uom" attrs="{'readonly': [('state', 'in', ('registered','done', 'cancel'))]}" context="{'company_id': parent.company_id}" groups="product.group_uom" options='{"no_open": True}' invisible="1"/>
@@ -219,12 +219,12 @@
                         <page string="Datos del vehiculo">
                             <group col="2" string="Caracteristicas">
                                 <group>
-                                    <field name="model_id"/>
-                                    <field name="model_year"/>
-                                    <field name="vin_sn"/>
+                                    <field name="model_id" attrs="{'required': [('partner_name', 'not in', ('Operaciones', 'operaciones'))]}"/>
+                                    <field name="model_year" attrs="{'required': [('partner_name', 'not in', ('Operaciones', 'operaciones'))]}"/>
+                                    <field name="vin_sn" attrs="{'required': [('partner_name', 'not in', ('Operaciones', 'operaciones'))]}"/>
                                 </group>
                                 <group>
-                                    <field name="license_plate"/>
+                                    <field name="license_plate" attrs="{'required': [('partner_name', 'not in', ('Operaciones', 'operaciones'))]}"/>
                                     <field name="color"/>
                                 </group>
                             </group>
@@ -232,20 +232,28 @@
                         <page string="Datos de la instalacion">
                             <group col="2">
                                 <group>
-                                    <field name="install_date"/>
-                                    <field name="installer_id" options="{'no_create': True}"/>
+                                    <field name="install_date" attrs="{'required': [('partner_name', 'not in', ('Operaciones', 'operaciones'))]}"/>
+                                    <field name="installer_id" options="{'no_create': True}" attrs="{'required': [('partner_name', 'not in', ('Operaciones', 'operaciones'))]}"/>
                                 </group>
                                 <group>
                                     <field name="select_period" string="Ciclo" widget="selection"/>
                                     <field name="blocking_type"/>
-                                    <field name="p_installation" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                    <field name="p_installation" widget="many2many_tags" options="{'color_field': 'color'}" attrs="{'required': [('partner_name', 'not in', ('Operaciones', 'operaciones'))]}"/>
                                 </group>
                             </group>
                         </page>
                         <page string="Otra información">
-                            <group col="1">
+                            <group col="2">
+                                <group>
+                                    <field name="phone_driver" string="Tel. Responsable"/>
+                                    <field name="num_conduce" string="Num. Conduce"/>
+                                </group>
                                 <group>
                                     <field name="note" placeholder="Alguna nota adicional ..."/>
+                                </group>
+                            </group>
+                            <group col="1">
+                                <group>
                                     <field name="company_id" options="{'no_create': True}"
                                            groups="base.group_multi_company"/>
                                 </group>
@@ -289,11 +297,11 @@
         <field name="model">octagono.gps</field>
         <field name="arch" type="xml">
             <search string="Search Octagono GPS">
-                <field name="name" string="Octagono Order"
-                       filter_domain="['|','|',('name','ilike',self),('client_order_ref','ilike',self),('partner_id','child_of',self)]"/>
+                <field name="name" string="Octagono Order" filter_domain="['|','|',('name','ilike',self),('client_order_ref','ilike',self),('partner_id','child_of',self)]"/>
                 <field name="partner_id" operator="child_of"/>
                 <field name="user_id"/>
                 <field name="product_id"/>
+                <field name="product_lot_id"/>
                 <filter string="Mis registros" name="my_octagono_gps_filter" domain="[('user_id','=',uid)]"/>
                 <filter string="Borradores" name="draft" domain="[('state','=','draft')]"/>
                 <filter string="Registros enviados" name="sent" domain="[('state','=','sent')]"/>
@@ -306,8 +314,7 @@
                 <separator/>
                 <filter string="Mis actividades" name="activities_my" domain="[('activity_ids.user_id', '=', uid)]"/>
                 <separator/>
-                <filter string="Actividades tardías" name="activities_overdue" domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"
-                        help="Mostrar todos los registros que tienen la próxima fecha de acción antes de hoy"/>
+                <filter string="Actividades tardías" name="activities_overdue" domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]" help="Mostrar todos los registros que tienen la próxima fecha de acción antes de hoy"/>
                 <filter string="Actividades de hoy" name="activities_today" domain="[('activity_ids.date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
                 <filter string="Actividades futuras" name="activities_upcoming_all" domain="[('activity_ids.date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
 

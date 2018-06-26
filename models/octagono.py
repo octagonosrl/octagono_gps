@@ -71,7 +71,7 @@ class OctagonoGPS(models.Model):
                                         help="Date on which the sales order is confirmed.", oldname="date_confirm")
     user_id = fields.Many2one('res.users', string='Usuario', index=True, track_visibility='onchange',
                               default=lambda self: self.env.user)
-    partner_id = fields.Many2one('res.partner', string='Propetario', required=True, change_default=True, index=True, track_visibility='always')
+    partner_id = fields.Many2one('res.partner', string='Propetario', required=True, change_default=True, index=True, track_visibility='onchange')
     partner_name = fields.Char(related='partner_id.name')
     partner_invoice_id = fields.Many2one('res.partner', string='Invoice Address', readonly=True, required=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Invoice address for current sales order.")
     partner_shipping_id = fields.Many2one('res.partner', string='Dirección de entrega', readonly=True, required=True,  states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Delivery address for current sales order.")
@@ -115,6 +115,8 @@ class OctagonoGPS(models.Model):
     is_assign = fields.Boolean(compute="_compute_is_assign")
     p_installation = fields.Many2many('octagono.gps.tags', 'octagono_gps_tags_rel', string="P. Instalacion")
     select_period = fields.Selection([('monthly', 'Mensual'), ('annual', 'Anual')], index=True, default='monthly', track_visibility="onchange")
+    phone_driver = fields.Char(string='Te. Responsable')
+    num_conduce = fields.Char(string='Num. Conduce')
 
     def _compute_is_expired(self):
         now = datetime.now()
@@ -135,14 +137,14 @@ class OctagonoGPS(models.Model):
                 raise UserError(_('You can not delete a sent quotation or a sales order! Try to cancel it before.'))
         return super(OctagonoGPS, self).unlink()
 
-    @api.multi
-    def _track_subtype(self, init_values):
-        self.ensure_one()
-        if 'state' in init_values and self.state == 'registered':
-            return 'octagono_gps.mt_register_confirmed'
-        elif 'state' in init_values and self.state == 'sent':
-            return 'octagono_gps.mt_register_sent'
-        return super(OctagonoGPS, self)._track_subtype(init_values)
+    # @api.multi
+    # def _track_subtype(self, init_values):
+    #     self.ensure_one()
+    #     if 'state' in init_values and self.state == 'registered':
+    #         return 'octagono_gps.mt_register_confirmed'
+    #     elif 'state' in init_values and self.state == 'sent':
+    #         return 'octagono_gps.mt_register_sent'
+    #     return super(OctagonoGPS, self)._track_subtype(init_values)
 
     @api.multi
     @api.onchange('partner_shipping_id', 'partner_id')
@@ -323,8 +325,11 @@ class OctagonoGPS(models.Model):
 
     @api.multi
     def _action_confirm(self):
-        for order in self.filtered(lambda order: order.partner_id not in order.message_partner_ids):
-            order.message_subscribe([order.partner_id.id])
+        # for order in self.filtered(lambda order: order.partner_id not in order.message_partner_ids):
+        #     order.message_subscribe([order.partner_id.id])
+        for order in self:
+            if order.partner_id.name in ('Operaciones', 'operaciones'):
+                raise ValidationError('No puedes confirmar en el estado actual.')
         self.write({
             'state': 'registered',
             'confirmation_date': fields.Datetime.now()
