@@ -302,6 +302,7 @@
                 <field name="user_id"/>
                 <field name="product_id"/>
                 <field name="product_lot_id"/>
+                <field name="vin_sn"/>
                 <filter string="Mis registros" name="my_octagono_gps_filter" domain="[('user_id','=',uid)]"/>
                 <filter string="Borradores" name="draft" domain="[('state','=','draft')]"/>
                 <filter string="Registros enviados" name="sent" domain="[('state','=','sent')]"/>
