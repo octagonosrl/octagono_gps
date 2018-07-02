@@ -232,8 +232,9 @@
                         <page string="Datos de la instalacion">
                             <group col="2">
                                 <group>
-                                    <field name="install_date" attrs="{'required': [('partner_name', 'not in', ('Operaciones', 'operaciones'))]}"/>
-                                    <field name="installer_id" options="{'no_create': True}" attrs="{'required': [('partner_name', 'not in', ('Operaciones', 'operaciones'))]}"/>
+                                    <field name="num_conduce" string="Num. Conduce"/>
+                                    <field name="install_date" string="Fecha de Instalacion" attrs="{'required': [('partner_name', 'not in', ('Operaciones', 'operaciones'))]}"/>
+                                    <field name="installer_id" string="Instalador" options="{'no_create': True}" attrs="{'required': [('partner_name', 'not in', ('Operaciones', 'operaciones'))]}"/>
                                 </group>
                                 <group>
                                     <field name="select_period" string="Ciclo" widget="selection"/>
@@ -245,8 +246,7 @@
                         <page string="Otra información">
                             <group col="2">
                                 <group>
-                                    <field name="phone_driver" string="Tel. Responsable"/>
-                                    <field name="num_conduce" string="Num. Conduce"/>
+                                    <field name="phone_driver" string="Tel. Responsable" widget="phone"/>
                                 </group>
                                 <group>
                                     <field name="note" placeholder="Alguna nota adicional ..."/>
@@ -254,8 +254,7 @@
                             </group>
                             <group col="1">
                                 <group>
-                                    <field name="company_id" options="{'no_create': True}"
-                                           groups="base.group_multi_company"/>
+                                    <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                                 </group>
                             </group>
                             <group col="1">

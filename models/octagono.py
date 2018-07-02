@@ -86,7 +86,7 @@ class OctagonoGPS(models.Model):
     product_lot_id = fields.Many2one('stock.production.lot', related='order_line.product_lot_id', string='Serial del producto')
     # Campo relacionados a vehiculos
     active = fields.Boolean(default=True, track_visibility="onchange")
-    blocking_type = fields.Selection(selection=[('b0', 'B0'), ('b1', 'B1'), ('b2', 'B2'), ('b3', 'B3')], default='b0', string="Tipo de bloqueo")
+    blocking_type = fields.Selection(selection=[('b0', 'B0'), ('b1', 'B1'), ('b2', 'B2'), ('b3', 'B3')], string="Tipo de bloqueo")
     color = fields.Many2one('octagono.gps.colors', track_visibility="onchange")
     driver = fields.Char('Responsable o Conductor', track_visibility="onchange")
     image = fields.Binary(related='model_id.image', string="Logo")
