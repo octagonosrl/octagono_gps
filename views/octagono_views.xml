@@ -70,7 +70,8 @@
                 <field name="message_needaction" invisible="1"/>
                 <field name="active" invisible="1"/>
                 <field name="name"/>
-                <field name="confirmation_date"/>
+                <field name="confirmation_date" invisible="1"/>
+                <field name="install_date"/>
                 <field name="product_lot_id"/>
                 <field name="partner_id"/>
                 <field name="user_id" invisible="1"/>
@@ -125,11 +126,13 @@
                             <field name="partner_invoice_id" groups="octagono_gps.group_octagono_gps_manager" context="{'default_type':'invoice'}" options='{"always_reload": True}' invisible="1"/>
                             <field name="partner_shipping_id" groups="octagono_gps.group_octagono_gps_manager" context="{'default_type':'delivery'}" options='{"always_reload": True}' invisible="1"/>
                             <field name="partner_name" invisible="1"/>
+                            <field name="confirmation_date" attrs="{'invisible': [('state', 'in', ['draft', 'sent', 'cancel'])]}"/>
                         </group>
                         <group>
                             <field name="driver"/>
                             <field name="validity_date" attrs="{'invisible': [('state', 'in', ['registered', 'done'])]}" invisible="1"/>
-                            <field name="confirmation_date" attrs="{'invisible': [('state', 'in', ['draft', 'sent', 'cancel'])]}"/>
+                            <field name="install_date" string="Fecha de Instalacion" attrs="{'required': [('partner_name', 'not in', ('Operaciones', 'operaciones'))]}"/>
+                            <field name="phone_driver" string="Tel. Responsable" widget="phone"/>
                             <field name="pricelist_id" groups="product.group_sale_pricelist" invisible="1"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
@@ -233,7 +236,6 @@
                             <group col="2">
                                 <group>
                                     <field name="num_conduce" string="Num. Conduce"/>
-                                    <field name="install_date" string="Fecha de Instalacion" attrs="{'required': [('partner_name', 'not in', ('Operaciones', 'operaciones'))]}"/>
                                     <field name="installer_id" string="Instalador" options="{'no_create': True}" attrs="{'required': [('partner_name', 'not in', ('Operaciones', 'operaciones'))]}"/>
                                 </group>
                                 <group>
@@ -246,15 +248,10 @@
                         <page string="Otra información">
                             <group col="2">
                                 <group>
-                                    <field name="phone_driver" string="Tel. Responsable" widget="phone"/>
+                                    <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                                 </group>
                                 <group>
                                     <field name="note" placeholder="Alguna nota adicional ..."/>
-                                </group>
-                            </group>
-                            <group col="1">
-                                <group>
-                                    <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                                 </group>
                             </group>
                             <group col="1">

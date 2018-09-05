@@ -68,7 +68,7 @@ class OctagonoGPS(models.Model):
     is_expired = fields.Boolean(compute='_compute_is_expired', string="Is expired")
     create_date = fields.Datetime(string='Creation Date', readonly=True, index=True, help="Date on which sales order is created.")
     confirmation_date = fields.Datetime(string='Fecha de confirmación', readonly=True, index=True, copy=False,
-                                        help="Date on which the sales order is confirmed.", oldname="date_confirm")
+                                        help=u"Fecha de confirmación.", oldname="date_confirm")
     user_id = fields.Many2one('res.users', string='Usuario', index=True, track_visibility='onchange',
                               default=lambda self: self.env.user)
     partner_id = fields.Many2one('res.partner', string='Propetario', required=True, change_default=True, index=True, track_visibility='onchange')
@@ -88,12 +88,12 @@ class OctagonoGPS(models.Model):
     active = fields.Boolean(default=True, track_visibility="onchange")
     blocking_type = fields.Selection(selection=[('b0', 'B0'), ('b1', 'B1'), ('b2', 'B2'), ('b3', 'B3')], string="Tipo de bloqueo")
     color = fields.Many2one('octagono.gps.colors', track_visibility="onchange")
-    driver = fields.Char('Responsable o Conductor', track_visibility="onchange")
+    driver = fields.Char('Responsable', track_visibility="onchange")
     image = fields.Binary(related='model_id.image', string="Logo")
     image_medium = fields.Binary(related='model_id.image_medium', string="Logo (medium)")
     image_small = fields.Binary(related='model_id.image_small', string="Logo (small)")
     license_plate = fields.Char('Matricula', track_visibility='onchange', help="Numero de matriculo o placa del vehiculo")
-    install_date = fields.Datetime(index=True, default=lambda self: fields.Datetime.now(), track_visibility="onchange")
+    install_date = fields.Datetime(string=u"Fecha de instalación", index=True, default=lambda self: fields.Datetime.now(), track_visibility="onchange")
     installer_id = fields.Many2one('hr.employee', "Instalador", domain="[('department_id.name', 'in', ['Operaciones', 'operaciones'])]", track_visibility="onchange")
     model_id = fields.Many2one('octagono.model', "Modelo", help="Model of the vehicle", track_visibility="onchange")
     model_year = fields.Selection(selection='gen_date_select', string="Año del modelo", track_visibility="onchange")
