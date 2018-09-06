@@ -386,7 +386,7 @@ class OctagonoGPS(models.Model):
         select = []
         date_start = _date.date(1960, 1, 1)
         today = _date.date.today()
-        for item in range(today.year - date_start.year + 1):
+        for item in range(today.year - date_start.year + 2):
             date_id = date_label = str(date_start.year + item)
             select.append((date_id, date_label))
         select.reverse()
