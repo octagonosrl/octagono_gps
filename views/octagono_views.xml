@@ -130,9 +130,9 @@
                         </group>
                         <group>
                             <field name="driver"/>
-                            <field name="validity_date" attrs="{'invisible': [('state', 'in', ['registered', 'done'])]}" invisible="1"/>
-                            <field name="install_date" string="Fecha de Instalacion" attrs="{'required': [('partner_name', 'not in', ('Operaciones', 'operaciones'))]}"/>
                             <field name="phone_driver" string="Tel. Responsable" widget="phone"/>
+                            <field name="install_date" string="Fecha de Instalacion" attrs="{'required': [('partner_name', 'not in', ('Operaciones', 'operaciones'))]}"/>
+                            <field name="validity_date" attrs="{'invisible': [('state', 'in', ['registered', 'done'])]}" invisible="1"/>
                             <field name="pricelist_id" groups="product.group_sale_pricelist" invisible="1"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
