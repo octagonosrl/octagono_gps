@@ -151,6 +151,7 @@
                                     <field name="state" invisible="1"/>
                                     <field name="currency_id" invisible="1"/>
                                     <field name="route_id" options="{'no_create': True}" invisible="1"/>
+                                    <field name="is_gps" invisible="1"/>
                                 </tree>
                                 <form string="GPS Lines">
                                     <header>
@@ -159,6 +160,7 @@
                                     <sheet>
                                         <group>
                                             <group>
+                                                <field name="is_gps" invisible="1"/>
                                                 <field name="product_updatable" invisible="1"/>
                                                 <field name="product_id" context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}" attrs="{'readonly': [('product_updatable', '=', False)]}" force_save="1"/>
                                                 <field name="product_lot_id" domain="[('product_id','=', product_id)]" context="{'default_product_id': product_id}"/>
@@ -189,6 +191,7 @@
                                     </sheet>
                                 </form>
                                 <kanban class="o_kanban_mobile">
+                                    <field name="is_gps" invisible="1"/>
                                     <field name="product_id"/>
                                     <field name="product_uom_qty"/>
                                     <field name="product_lot_id"/>
@@ -360,6 +363,7 @@
                 <field name="qty_delivered"/>
                 <field name="product_uom" string="Unit of Measure" groups="product.group_uom"/>
                 <field name="route_id" options="{'no_create': True}" invisible="1"/>
+                <field name="is_gps" invisible="1"/>
             </tree>
         </field>
     </record>

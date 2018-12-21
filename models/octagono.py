@@ -2,8 +2,8 @@
 import logging
 import datetime as _date
 from datetime import datetime, timedelta, date
-from itertools import groupby
-from operator import itemgetter
+# from itertools import groupby
+# from operator import itemgetter
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
@@ -567,6 +567,7 @@ class OctagonoGPSLine(models.Model):
     product_packaging = fields.Many2one('product.packaging', string='Package', default=False)
     route_id = fields.Many2one('stock.location.route', string='Route', domain=[('octagono_selectable', '=', True)], ondelete='restrict')
     move_ids = fields.One2many('stock.move', 'octagono_line_id', string='Stock Moves', readonly=True, ondelete='set null', copy=False)
+    is_gps = fields.Boolean(default=False)
 
     @api.depends('product_uom_qty', 'discount', 'price_unit', 'tax_id')
     def _compute_amount(self):
@@ -765,8 +766,12 @@ class OctagonoGPSLine(models.Model):
             pricelist=self.order_id.pricelist_id.id,
             uom=self.product_uom.id
         )
+        cat_gps = ['GPS', 'gps', 'Gps']
+        is_gps = False
+        if self.product_id.categ_id.name in cat_gps:
+            is_gps = True
 
-        result = {'domain': domain}
+        result = {'domain': domain, 'value': {'is_gps': is_gps}}
 
         name = product.name_get()[0][1]
         if product.description_octagono:
