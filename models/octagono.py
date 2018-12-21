@@ -766,12 +766,8 @@ class OctagonoGPSLine(models.Model):
             pricelist=self.order_id.pricelist_id.id,
             uom=self.product_uom.id
         )
-        cat_gps = ['GPS', 'gps', 'Gps']
-        is_gps = False
-        if self.product_id.categ_id.name in cat_gps:
-            is_gps = True
 
-        result = {'domain': domain, 'value': {'is_gps': is_gps}}
+        result = {'domain': domain}
 
         name = product.name_get()[0][1]
         if product.description_octagono:
@@ -1052,9 +1048,25 @@ class OctagonoGPSLine(models.Model):
             ], ['lot_id'], 'lot_id')
             available_lot_ids = [quant['lot_id'][0] for quant in quants]
         self.product_lot_id = False
+
+        is_gps = False
+        if self.product_id:
+            cat_gps = ['GPS', 'gps', 'Gps']
+            if self.product_id.categ_id.name in cat_gps:
+                is_gps = True
         return {
-            'domain': {'product_lot_id': [('id', 'in', available_lot_ids)]}
+            'domain': {'product_lot_id': [('id', 'in', available_lot_ids)]},
+            'value': {'is_gps': is_gps},
         }
+
+    def init(self):
+        for gps_line in self.env['octagono.gps.line'].search([]):
+            is_gps = False
+            if gps_line.product_id:
+                cat_gps = ['GPS', 'gps', 'Gps']
+                if gps_line.product_id.categ_id.name in cat_gps:
+                    is_gps = True
+            gps_line.write({'is_gps': is_gps})
 
 
 class OctagonoGPSTags(models.Model):
