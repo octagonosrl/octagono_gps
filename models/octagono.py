@@ -23,6 +23,7 @@ class OctagonoGPS(models.Model):
     _sql_constraints = [
         ('octagono_gps_vin_sn_unique', 'unique(vin_sn)', 'La numeracion del chasis ya existe.')
     ]
+    account = fields.Char(related="partner_id.x_studio_field_ddQ6z", store=True)
 
     @api.model
     def get_empty_list_help(self, help):
@@ -252,6 +253,7 @@ class OctagonoGPS(models.Model):
         if 'order_line' not in default:
             default['order_line'] = [(0, 0, line.copy_data()[0]) for line in
                                      self.order_line.filtered(lambda l: not l.is_downpayment)]
+        default['vin_sn'] = (self.vin_sn.split('-', 1))[0]
         return super(OctagonoGPS, self).copy_data(default)
 
     @api.multi

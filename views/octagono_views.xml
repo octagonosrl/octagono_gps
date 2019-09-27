@@ -74,6 +74,7 @@
                 <field name="install_date"/>
                 <field name="product_lot_id"/>
                 <field name="partner_id"/>
+                <field name="account"/>
                 <field name="user_id" invisible="1"/>
                 <field name="driver"/>
                 <field name="vin_sn"/>
@@ -101,9 +102,11 @@
                     <button name="action_unlock"  string="Desbloquear"  states="done" type="object" groups="octagono_gps.group_octagono_gps_manager"/>
                     <button name="action_assign_custom" string="Asignar productos" class="oe_highlight" type="object" attrs="{'invisible': ['|', '|' , ('delivery_count', '=', 0), ('state','not in', ('registered','done')),  ('is_waiting', '=', False)]}"/>
                     <button name="action_picking_done" string="Validar productos" class="oe_highlight" type="object" attrs="{'invisible': ['|', '|' , ('delivery_count', '=', 0), ('state','not in', ('assigned'))]}"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,sent,registered"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,registered"/>
                 </header>
                 <sheet>
+
+
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_delivery" type="object" class="oe_stat_button" icon="fa-truck" attrs="{'invisible': [('delivery_count', '=', 0)]}">
                             <field name="delivery_count" widget="statinfo" string="Delivery"/>
@@ -304,7 +307,7 @@
                 <field name="vin_sn"/>
                 <filter string="Mis registros" name="my_octagono_gps_filter" domain="[('user_id','=',uid)]"/>
                 <filter string="Borradores" name="draft" domain="[('state','=','draft')]"/>
-                <filter string="Registros enviados" name="sent" domain="[('state','=','sent')]"/>
+<!--                <filter string="Registros enviados" name="sent" domain="[('state','=','sent')]"/>-->
                 <filter string="Registrados" name="registered" domain="[('state','=','registered')]"/>
                 <filter string="Productos Asignados" name="registered" domain="[('state','=','assigned')]"/>
                 <filter string="Confirmados" name="done" domain="[('state','=','done')]"/>
@@ -320,7 +323,8 @@
 
                 <group expand="1" string="Group By">
                     <filter string="Usuario" name="users" domain="[]" context="{'group_by':'user_id'}"/>
-                    <filter string="Propetario" name="propetario" domain="[]" context="{'group_by':'partner_id'}"/>
+                    <filter string="Propetario" name="propetario" domain="[('state', '!=', 'cancel')]" context="{'group_by':'partner_id'}"/>
+                    <filter string="Cuenta" name="cuenta" domain="[]" context="{'group_by':'account'}"/>
                     <filter string="Mes del registro" domain="[]" context="{'group_by':'date_order'}"/>
                     <filter string="Fecha de creacion" name="create_date" domain="[]" context="{'group_by': 'create_date'}"/>
                     <filter string="Fecha de confirmacion" name="create_date" domain="[]" context="{'group_by': 'confirmation_date'}"/>

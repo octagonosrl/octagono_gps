@@ -19,6 +19,7 @@
         'data/gps_cars_data.xml',
         'data/gps_data.xml',
         'data/gps_colors_data.xml',
+        'views/stock_picking_relation.xml',
     ],
     'demo': [],
     'application': True,
