@@ -323,8 +323,9 @@
 
                 <group expand="1" string="Group By">
                     <filter string="Usuario" name="users" domain="[]" context="{'group_by':'user_id'}"/>
-                    <filter string="Propetario" name="propetario" domain="[('state', '!=', 'cancel')]" context="{'group_by':'partner_id'}"/>
+                    <filter string="Propetario > Sin Cancelados" name="propetario" domain="[('state', '!=', 'cancel')]" context="{'group_by':'partner_id'}"/>
                     <filter string="Cuenta" name="cuenta" domain="[]" context="{'group_by':'account'}"/>
+                    <filter string="Serial del Producto" name="lot_id" domain="[]" context="{'group_by':'product_lot_id'}"/>
                     <filter string="Mes del registro" domain="[]" context="{'group_by':'date_order'}"/>
                     <filter string="Fecha de creacion" name="create_date" domain="[]" context="{'group_by': 'create_date'}"/>
                     <filter string="Fecha de confirmacion" name="create_date" domain="[]" context="{'group_by': 'confirmation_date'}"/>

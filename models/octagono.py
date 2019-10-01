@@ -84,7 +84,7 @@ class OctagonoGPS(models.Model):
     fiscal_position_id = fields.Many2one('account.fiscal.position', oldname='fiscal_position', string='Fiscal Position')
     company_id = fields.Many2one('res.company', 'Empresa', default=lambda self: self.env['res.company']._company_default_get('octagono.gps'))
     product_id = fields.Many2one('product.product', related='order_line.product_id', string='Product')
-    product_lot_id = fields.Many2one('stock.production.lot', related='order_line.product_lot_id', string='Serial del producto')
+    product_lot_id = fields.Many2one('stock.production.lot', related='order_line.product_lot_id', string='Serial del producto', store=True)
     # Campo relacionados a vehiculos
     active = fields.Boolean(default=True, track_visibility="onchange")
     blocking_type = fields.Selection(selection=[('b0', 'B0'), ('b1', 'B1'), ('b2', 'B2'), ('b3', 'B3')], string="Tipo de bloqueo")
