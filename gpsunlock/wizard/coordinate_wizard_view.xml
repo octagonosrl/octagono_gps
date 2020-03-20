@@ -1,0 +1,41 @@
+<odoo>
+    <record id="coordinate_wizard_view" model="ir.ui.view">
+        <field name="name">Mapa</field>
+        <field name="model">coordinate.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <!--<field name="coordinate_image" widget="image" src='/gpsunlock/static/image/Dominican-Republic-700x420.jpg'/>-->
+                <center><img name="coordinate_image" width="640" height="540" src='/gpsunlock/static/image/loader_car.gif'/></center>
+                <field name="coordinate_url" invisible="1"/>
+
+                <script type="text/javascript">
+                    //$(document).ready(function(){
+                        setInterval(function(){ 
+                                
+                                //if($('img[name=coordinate_url]').length != 0){
+                                if(document.getElementsByName('coordinate_url').length != 0){
+                                    document.getElementsByName('coordinate_image')[0].src = document.getElementsByName('coordinate_url')[0].value;
+                                    //$('input[name=coordinate_url]').hide();
+                                }
+                                
+                            }, 1000);
+                    //});
+                </script>
+
+
+                <footer>
+                    <button special="cancel">Cerrar</button>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_view_map" model="ir.actions.act_window">
+        <field name="name">Mapa</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">coordinate.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>
