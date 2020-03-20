@@ -309,6 +309,7 @@
                 <filter string="Borradores" name="draft" domain="[('state','=','draft')]"/>
 <!--                <filter string="Registros enviados" name="sent" domain="[('state','=','sent')]"/>-->
                 <filter string="Registrados" name="registered" domain="[('state','=','registered')]"/>
+                <filter string="Cancelados" name="canceled" domain="[('state','=','cancel')]" context="{'group_by':'partner_id'}"/>
                 <filter string="Productos Asignados" name="registered" domain="[('state','=','assigned')]"/>
                 <filter string="Confirmados" name="done" domain="[('state','=','done')]"/>
                 <filter string="Registro Archivados" name="archived" domain="[('active', '=', 0)]"/>
