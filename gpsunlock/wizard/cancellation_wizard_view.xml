@@ -8,7 +8,7 @@
 		<field name="model">cancellation.wizard</field>
 		<field name="arch" type="xml">
 			<form string="Message">
-				<group >
+				<group>
                         <div class="oe_title">
                             <h1>
 								<field name="vehicle_id" string="Vehiculo"/>
@@ -24,8 +24,8 @@
 				</group>
 				</group>
 				<footer>
-					<button name="return_action" type="object" string="Retornar" class="btn-primary"  />
-					<button string="Cancel" class="btn-secondary" special="cancel" />
+					<button name="return_action" type="object" string="Retornar" class="btn-primary"/>
+					<button string="Cancelar" class="btn-secondary" special="cancel"/>
 				</footer>
 
 

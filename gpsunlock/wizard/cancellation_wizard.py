@@ -15,18 +15,15 @@ class CancellationWizard(models.TransientModel):
             result['vehicle_id'] = gps.id
         return result
 
-    vehicle_id = fields.Many2one('octagono.gps', 'Vehiculo', readonly="1",store=True, required=True)
+    vehicle_id = fields.Many2one('octagono.gps', 'Vehiculo', readonly=True, required=True)
     cancellation_reason = fields.Selection([('vehicle_change', 'Cambio de Vehiculo'), ('warranty', 'Garantia'),
                                             ('owner_change', 'Cambio de Dueño'), ('repair', 'Vehiculo en Reparacion'),
                                             ('contract_end', 'Finalizacion de Contrato')],
-                                           string="Motivo de Cancelacion",required=True)
-    cancel_date = fields.Datetime(string="Fecha de Cancelación", readonly="1", default=datetime.today())
+                                           string="Motivo de Cancelacion", required=True)
+    cancel_date = fields.Date(string="Fecha de Cancelación", default=datetime.today(), required=True)
 
     @api.multi
     def return_action(self):
-
         vehicle = self.vehicle_id
-       
-        cancellation = self.env['cancellation.gps'].create({'vehicle_id': vehicle.id, 'cancellation_reason': self.cancellation_reason, 'cancel_date': self.cancel_date})
-        vehicle.last_cancellation = self.cancellation_reason
-        vehicle._create_returns()
+        vehicle._create_returns(self.cancellation_reason)
+

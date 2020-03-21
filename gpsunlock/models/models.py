@@ -5,14 +5,14 @@ from odoo.tools.float_utils import float_compare, float_is_zero
 import time
 from datetime import datetime
 
-class practica__orm(models.Model):
+
+class OctagonoGps(models.Model):
     _inherit = 'octagono.gps'
 
-    cancel_date = fields.Datetime(string="Fecha de Cancelación")
-    cancellation_reason = fields.Selection([('vehicle_change', 'Cambio de Vehiculo'),('warranty', 'Garantia'),
-                                        ('owner_change', 'Cambio de Dueño'),('repair', 'Vehiculo en Reparacion'),
-                                        ('contract_end', 'Finalizacion de Contrato')],string="Motivo de Cancelacion")
-    last_invoice = fields.Datetime(string="Ultima fecha de Cobro")
+    cancel_date = fields.Date(string="Fecha de Cancelación")
+    cancellation_reason = fields.Selection([('vehicle_change', 'Cambio de Vehiculo'), ('warranty', 'Garantia'),
+                                            ('owner_change', 'Cambio de Dueño'), ('repair', 'Vehiculo en Reparacion'),
+                                            ('contract_end', 'Finalizacion de Contrato')], string="Motivo de Cancelacion")
 
     @api.multi
     def _prepare_move_default_values(self, return_line, new_picking):
@@ -31,9 +31,7 @@ class practica__orm(models.Model):
         }
         return vals
 
-    def _create_returns(self):
-
-
+    def _create_returns(self, cancellation_reason):
         # create new picking for returned products
         lot = []
         lines = []
@@ -75,6 +73,7 @@ class practica__orm(models.Model):
         else:
             raise UserError("El chasis esta vacío, por favor rellenar.")
         self.cancel_date = date
+        self.cancellation_reason = cancellation_reason
 
         # new_picking.action_confirm()
         new_picking.action_assign()
@@ -83,11 +82,7 @@ class practica__orm(models.Model):
         self.state = 'cancel'
 
     def create_returns(self):
-        # for wizard in self:
-        #     wizard._create_returns()
-        #
         view = self.env.ref('gpsunlock.cancellation_wizard_view')
-        view_id = view and view.id or False
         context = dict(self._context or {})
 
         return {
@@ -101,21 +96,3 @@ class practica__orm(models.Model):
             'target': 'new',
             'context': context,
         }
-
-    def restore_vehicle(self):
-        if self.last_cancellation == 'warranty':
-            self.state = 'registered'
-        if self.last_cancellation == 'owner_change':
-            self.state = 'draft'
-        if self.last_cancellation == 'repair':
-            self.state = 'registered'
-        split = self.vin_sn.split('-')
-        self.vin_sn = split[0]
-
-
-
-
-
-
-
-
