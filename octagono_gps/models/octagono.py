@@ -84,7 +84,25 @@ class OctagonoGPS(models.Model):
     fiscal_position_id = fields.Many2one('account.fiscal.position', oldname='fiscal_position', string='Fiscal Position')
     company_id = fields.Many2one('res.company', 'Empresa', default=lambda self: self.env['res.company']._company_default_get('octagono.gps'))
     product_id = fields.Many2one('product.product', related='order_line.product_id', string='Product')
-    product_lot_id = fields.Many2one('stock.production.lot', related='order_line.product_lot_id', string='Serial del producto', store=True)
+    # product_lot_id = fields.Many2one('stock.production.lot', related='order_line.product_lot_id', string='Serial del producto', store=True)
+    gps_id = fields.Many2one('product.product', compute='_get_product_lots', string='GPS', store=True)
+    gps_lot_id = fields.Many2one('stock.production.lot', compute='_get_product_lots', string='Serial GPS', store=True)
+    sim_id = fields.Many2one('product.product', compute='_get_product_lots', string='SIM', store=True)
+    sim_lot_id = fields.Many2one('stock.production.lot', compute='_get_product_lots', string='Serial SIM', store=True)
+
+    @api.depends('order_line', 'order_line.product_id', 'order_line.product_lot_id')
+    def _get_product_lots(self):
+        for rec in self.filtered('order_line'):
+            gps_line = rec.order_line.filtered(lambda line: 'GPS' in line.product_id.name) or False
+            sim_line = rec.order_line.filtered(lambda line: 'SIM' in line.product_id.name) or False
+
+            if gps_line:
+                rec.gps_id = gps_line.product_id.id
+                rec.gps_lot_id = gps_line.product_lot_id.id
+            if sim_line:
+                rec.sim_id = sim_line.product_id.id
+                rec.sim_lot_id = sim_line.product_lot_id.id
+
     # Campo relacionados a vehiculos
     active = fields.Boolean(default=True, track_visibility="onchange")
     blocking_type = fields.Selection(selection=[('b0', 'B0'), ('b1', 'B1'), ('b2', 'B2'), ('b3', 'B3')], string="Tipo de bloqueo")

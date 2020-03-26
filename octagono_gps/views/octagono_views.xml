@@ -72,7 +72,10 @@
                 <field name="name"/>
                 <field name="confirmation_date" invisible="1"/>
                 <field name="install_date"/>
-                <field name="product_lot_id"/>
+                <field name="gps_id"/>
+                <field name="gps_lot_id"/>
+                <field name="sim_id"/>
+                <field name="sim_lot_id"/>
                 <field name="partner_id"/>
                 <field name="account"/>
                 <field name="user_id" invisible="1"/>
@@ -303,7 +306,10 @@
                 <field name="partner_id" operator="child_of"/>
                 <field name="user_id"/>
                 <field name="product_id"/>
-                <field name="product_lot_id"/>
+                <field name="gps_id"/>
+                <field name="gps_lot_id"/>
+                <field name="sim_id"/>
+                <field name="sim_lot_id"/>
                 <field name="vin_sn"/>
                 <filter string="Mis registros" name="my_octagono_gps_filter" domain="[('user_id','=',uid)]"/>
                 <filter string="Borradores" name="draft" domain="[('state','=','draft')]"/>
@@ -326,7 +332,10 @@
                     <filter string="Usuario" name="users" domain="[]" context="{'group_by':'user_id'}"/>
                     <filter string="Propetario > Sin Cancelados" name="propetario" domain="[('state', '!=', 'cancel')]" context="{'group_by':'partner_id'}"/>
                     <filter string="Cuenta" name="cuenta" domain="[]" context="{'group_by':'account'}"/>
-                    <filter string="Serial del Producto" name="product_lot_id" domain="[]" context="{'group_by':'product_lot_id'}"/>
+                    <filter string="GPS" name="gps_id" domain="[]" context="{'group_by':'gps_id'}"/>
+                    <filter string="Serial GPS" name="gps_lot_id" domain="[]" context="{'group_by':'gps_lot_id'}"/>
+                    <filter string="SIM" name="sim_id" domain="[]" context="{'group_by':'sim_id'}"/>
+                    <filter string="Serial SIM" name="sim_lot_id" domain="[]" context="{'group_by':'sim_lot_id'}"/>
                     <filter string="Mes del registro" domain="[]" context="{'group_by':'date_order'}"/>
                     <filter string="Fecha de creacion" name="create_date" domain="[]" context="{'group_by': 'create_date'}"/>
                     <filter string="Fecha de confirmacion" name="create_date" domain="[]" context="{'group_by': 'confirmation_date'}"/>
