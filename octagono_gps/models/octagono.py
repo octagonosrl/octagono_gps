@@ -370,10 +370,11 @@ class OctagonoGPS(models.Model):
     
     @api.multi
     def toggle_suspension(self):
-        if self.state == 'suspended':
-            self.state = 'done'
-        else self.state == 'done':
-            self.state = 'suspended'
+        pass
+        # if self.state == 'suspended':
+        #     self.state = 'done'
+        # else self.state == 'done':
+        #     self.state = 'suspended'
 
 
     # observacion
