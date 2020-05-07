@@ -370,11 +370,12 @@ class OctagonoGPS(models.Model):
     
     @api.multi
     def toggle_suspension(self):
-        pass
-        # if self.state == 'suspended':
-        #     self.state = 'done'
-        # else self.state == 'done':
-        #     self.state = 'suspended'
+        if self.state == 'suspended':
+            self.write({'state': 'done'})
+        elif self.state == 'done':
+            self.write({'state': 'suspended'})
+        else:
+            raise ValidationError('Solo puede utilizar este botón si el GPS está suspendido o asignado.')
 
 
     # observacion
