@@ -105,7 +105,9 @@
                     <button name="action_unlock"  string="Desbloquear"  states="done" type="object" groups="octagono_gps.group_octagono_gps_manager"/>
                     <button name="action_assign_custom" string="Asignar productos" class="oe_highlight" type="object" attrs="{'invisible': ['|', '|' , ('delivery_count', '=', 0), ('state','not in', ('registered','done')),  ('is_waiting', '=', False)]}"/>
                     <button name="action_picking_done" string="Validar productos" class="oe_highlight" type="object" attrs="{'invisible': ['|', '|' , ('delivery_count', '=', 0), ('state','not in', ('assigned'))]}"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,registered"/>
+                    <button name="toggle_suspension" string="Suspender" class="btn-default" type="object" attrs="{'invisible': ['|', '|' , ('delivery_count', '=', 0), ('state','not in', ('done'))]}"/>
+                    <button name="toggle_suspension" string="Restablecer" class="btn-default" type="object" attrs="{'invisible': ['|', '|' , ('delivery_count', '=', 0), ('state','not in', ('suspended'))]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,registered,suspended"/>
                 </header>
                 <sheet>
 

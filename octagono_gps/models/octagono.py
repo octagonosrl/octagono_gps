@@ -60,6 +60,7 @@ class OctagonoGPS(models.Model):
         ('done', 'Asignado'),
         ('assigned', 'Producto Asignado'),
         ('valid_product', 'Producto Validado'),
+        ('suspended', 'Suspendido'),
         ('cancel', 'Cancelado'),
     ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', default='draft')
     date_order = fields.Datetime(string='Order Date', required=True, readonly=True, index=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, copy=False, default=fields.Datetime.now)
@@ -366,6 +367,14 @@ class OctagonoGPS(models.Model):
     def action_confirm(self):
         self._action_confirm()
         return True
+    
+    @api.multi
+    def toggle_suspension(self):
+        if self.state == 'suspended':
+            self.state = 'done'
+        else self.state == 'done':
+            self.state = 'suspended'
+
 
     # observacion
     @api.multi
@@ -580,6 +589,7 @@ class OctagonoGPSLine(models.Model):
         ('done', 'Asignado'),
         ('assigned', 'Producto Asignado'),
         ('valid_product', 'Producto Validado'),
+        ('suspended', 'Suspendido'),
         ('cancel', 'Cancelado'),
     ], related='order_id.state', string='Order Status', readonly=True, copy=False, store=True, default='draft')
     customer_lead = fields.Float('Delivery Lead Time', required=True, default=0.0, oldname="delay",
