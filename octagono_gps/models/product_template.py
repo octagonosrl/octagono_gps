@@ -2,7 +2,7 @@
 import logging
 
 from odoo import api, fields, models
-from odoo.addons.base.res.res_partner import WARNING_MESSAGE, WARNING_HELP
+# from odoo.addons.base.res.res_partner import WARNING_MESSAGE, WARNING_HELP
 
 _logger = logging.getLogger(__name__)
 

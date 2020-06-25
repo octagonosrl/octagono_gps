@@ -23,7 +23,7 @@ class OctagonoGPS(models.Model):
     _sql_constraints = [
         ('octagono_gps_vin_sn_unique', 'unique(vin_sn)', 'La numeracion del chasis ya existe.')
     ]
-    account = fields.Char(related="partner_id.x_studio_field_ddQ6z", store=True)
+    account = fields.Char(related="partner_id.octagono_gps_account", store=True)
 
     @api.model
     def get_empty_list_help(self, help):
@@ -118,10 +118,6 @@ class OctagonoGPS(models.Model):
     model_id = fields.Many2one('octagono.model', "Modelo", help="Model of the vehicle", track_visibility="onchange")
     model_year = fields.Selection(selection='gen_date_select', string="Año del modelo", track_visibility="onchange")
     vin_sn = fields.Char("Num. Chasis", track_visibility="onchange")
-    incoterm = fields.Many2one(
-        'stock.incoterms', 'Incoterms',
-        help="International Commercial Terms are a series of predefined "
-             "commercial terms used in international transactions.", track_visibility="onchange")
     picking_policy = fields.Selection([
         ('direct', 'Entregar cada producto cuando esté disponible'),
         ('one', 'Entregar todos los productos a la vez')],
@@ -359,7 +355,7 @@ class OctagonoGPS(models.Model):
         #     self.force_quotation_send()
 
         for order in self:
-            order.order_line._action_launch_procurement_rule()
+            order.order_line._action_launch_stock_rule()
 
         return True
 
@@ -572,7 +568,7 @@ class OctagonoGPSLine(models.Model):
     product_lot_id = fields.Many2one('stock.production.lot', string='Serial del producto', change_default=True, ondelete='restrict', required=True)
     product_updatable = fields.Boolean(compute='_compute_product_updatable', string='Can Edit Product', readonly=True, default=True)
     product_uom_qty = fields.Float(string='Quantity', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0)
-    product_uom = fields.Many2one('product.uom', string='Unit of Measure', required=True)
+    product_uom = fields.Many2one('uom.uom', string='Unit of Measure', required=True)
     # Non-stored related field to allow portal user to see the image of the product he has ordered
     product_image = fields.Binary('Product Image', related="product_id.image", store=False)
     qty_delivered_updateable = fields.Boolean(compute='_compute_qty_delivered_updateable', string='Can Edit Delivered', readonly=True, default=True)
@@ -685,7 +681,7 @@ class OctagonoGPSLine(models.Model):
             msg = _("Extra line with %s ") % (line.product_id.display_name,)
             line.order_id.message_post(body=msg)
             # si el state es registered invocamos la funcion encargada del movimiento de stock
-            line._action_launch_procurement_rule()
+            line._action_launch_stock_rule()
         return line
 
     def _update_line_quantity(self, values):
@@ -738,12 +734,12 @@ class OctagonoGPSLine(models.Model):
                 lambda r: r.state == 'registered' and float_compare(r.product_uom_qty, values['product_uom_qty'],
                                                                     precision_digits=precision) == -1)
 
-            lines._action_launch_procurement_rule()
+            lines._action_launch_stock_rule()
 
         return super(OctagonoGPSLine, self).write(values)
 
     @api.multi
-    def _prepare_procurement_values(self, group_id=False):
+    def _prepare_stock_values(self, group_id=False):
         """ Prepare una clave específica para movimientos u otros componentes que se crearán a partir
         de una regla de adquisición procedente de una línea de orden de venta. Este método podría anularse
         para agregar otra clave personalizada que podría ser utilizado en la creación de movimiento / po.
@@ -978,7 +974,7 @@ class OctagonoGPSLine(models.Model):
         return {}
 
     @api.multi
-    def _action_launch_procurement_rule(self):
+    def _action_launch_stock_rule(self):
         """Inicie el método de ejecución del grupo de compras con campos requeridos / personalizados generados por un
          línea de orden de venta. El grupo de compras lanzará '_run_move', '_run_buy' o '_run_manufacture'
          dependiendo de la regla del producto de la línea de orden de venta.
@@ -1059,7 +1055,7 @@ class OctagonoGPSLine(models.Model):
 
         # Check Drop-Shipping
         if not is_available:
-            for pull_rule in product_routes.mapped('pull_ids'):
+            for pull_rule in product_routes.mapped('rule_ids'):
                 if pull_rule.picking_type_id.sudo().default_location_src_id.usage == 'supplier' and \
                                 pull_rule.picking_type_id.sudo().default_location_dest_id.usage == 'customer':
                     is_available = True

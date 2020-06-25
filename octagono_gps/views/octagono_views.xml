@@ -155,7 +155,7 @@
                                     <field name="product_lot_id" domain="[('product_id','=', product_id)]" context="{'default_product_id': product_id}" attrs="{'readonly': [('product_updatable', '=', False), ('state', 'in', ('registered','done', 'cancel'))]}" groups="stock.group_production_lot" options='{"no_create": True}'/>
                                     <field name="name"/>
                                     <field name="product_uom_qty" string="Ordered Qty" context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id}" invisible="1"/>
-                                    <field name="product_uom" attrs="{'readonly': [('state', 'in', ('registered','done', 'cancel'))]}" context="{'company_id': parent.company_id}" groups="product.group_uom" options='{"no_open": True}' invisible="1"/>
+                                    <field name="product_uom" attrs="{'readonly': [('state', 'in', ('registered','done', 'cancel'))]}" context="{'company_id': parent.company_id}" groups="uom.group_uom" options='{"no_open": True}' invisible="1"/>
                                     <field name="state" invisible="1"/>
                                     <field name="currency_id" invisible="1"/>
                                     <field name="route_id" options="{'no_create': True}" invisible="1"/>
@@ -177,7 +177,7 @@
                                                 <label for="product_uom_qty" string="Ordered Quantity" invisible="1"/>
                                                 <div>
                                                     <field name="product_uom_qty" context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'uom_qty_change':True, 'company_id': parent.company_id}" class="oe_inline" invisible="1"/>
-                                                    <field name="product_uom" groups="product.group_uom" class="oe_inline oe_no_button" attrs="{'readonly': [('state', 'in', ('registered','done', 'cancel'))]}" invisible="1"/>
+                                                    <field name="product_uom" groups="uom.group_uom" class="oe_inline oe_no_button" attrs="{'readonly': [('state', 'in', ('registered','done', 'cancel'))]}" invisible="1"/>
                                                 </div>
                                                 <label for="qty_delivered" string="Cantidad entregada" attrs="{'invisible': [('parent.state', 'not in', ['registered', 'done'])]}" invisible="0"/>
                                                 <div attrs="{'invisible': [('parent.state', 'not in', ['registered', 'done'])]}">
@@ -203,7 +203,7 @@
                                     <field name="product_id"/>
                                     <field name="product_uom_qty"/>
                                     <field name="product_lot_id"/>
-                                    <field name="product_uom" groups="product.group_uom"/>
+                                    <field name="product_uom" groups="uom.group_uom"/>
                                     <templates>
                                         <t t-name="kanban-box">
                                             <div t-attf-class="oe_kanban_card oe_kanban_global_click">
@@ -268,7 +268,6 @@
                             <group col="1">
                                 <group string="Información de envío" name="octagono_shipping">
                                     <field name="warehouse_id" options="{'no_create': True}"/>
-                                    <field name="incoterm" widget="selection"/>
                                     <field name="picking_policy"/>
                                 </group>
                             </group>
@@ -298,53 +297,53 @@
         </field>
     </record>
 
-    <!--Octagono Order Search View-->
-    <record id="view_octagono_gps_filter" model="ir.ui.view">
-        <field name="name">octagono.gps.search</field>
-        <field name="model">octagono.gps</field>
-        <field name="arch" type="xml">
-            <search string="Search Octagono GPS">
-                <field name="name" string="Octagono Order" filter_domain="['|','|',('name','ilike',self),('client_order_ref','ilike',self),('partner_id','child_of',self)]"/>
-                <field name="partner_id" operator="child_of"/>
-                <field name="user_id"/>
-                <field name="product_id"/>
-                <field name="gps_id"/>
-                <field name="gps_lot_id"/>
-                <field name="sim_id"/>
-                <field name="sim_lot_id"/>
-                <field name="vin_sn"/>
-                <filter string="Mis registros" name="my_octagono_gps_filter" domain="[('user_id','=',uid)]"/>
-                <filter string="Borradores" name="draft" domain="[('state','=','draft')]"/>
-<!--                <filter string="Registros enviados" name="sent" domain="[('state','=','sent')]"/>-->
-                <filter string="Registrados" name="registered" domain="[('state','=','registered')]"/>
-                <filter string="Cancelados" name="canceled" domain="[('state','=','cancel')]" context="{'group_by':'partner_id'}"/>
-                <filter string="Productos Asignados" name="registered" domain="[('state','=','assigned')]"/>
-                <filter string="Confirmados" name="done" domain="[('state','=','done')]"/>
-                <filter string="Registro Archivados" name="archived" domain="[('active', '=', 0)]"/>
-                <separator/>
-                <filter string="Mensajes no leídos" name="message_needaction" domain="[('message_needaction','=',True)]"/>
-                <separator/>
-                <filter string="Mis actividades" name="activities_my" domain="[('activity_ids.user_id', '=', uid)]"/>
-                <separator/>
-                <filter string="Actividades tardías" name="activities_overdue" domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]" help="Mostrar todos los registros que tienen la próxima fecha de acción antes de hoy"/>
-                <filter string="Actividades de hoy" name="activities_today" domain="[('activity_ids.date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
-                <filter string="Actividades futuras" name="activities_upcoming_all" domain="[('activity_ids.date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
+<!--    &lt;!&ndash;Octagono Order Search View&ndash;&gt;-->
+<!--    <record id="view_octagono_gps_filter" model="ir.ui.view">-->
+<!--        <field name="name">octagono.gps.search</field>-->
+<!--        <field name="model">octagono.gps</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <search string="Search Octagono GPS">-->
+<!--                <field name="name" string="Octagono Order" filter_domain="['|','|',('name','ilike',self),('client_order_ref','ilike',self),('partner_id','child_of',self)]"/>-->
+<!--                <field name="partner_id" operator="child_of"/>-->
+<!--                <field name="user_id"/>-->
+<!--                <field name="product_id"/>-->
+<!--                <field name="gps_id"/>-->
+<!--                <field name="gps_lot_id"/>-->
+<!--                <field name="sim_id"/>-->
+<!--                <field name="sim_lot_id"/>-->
+<!--                <field name="vin_sn"/>-->
+<!--                <filter string="Mis registros" name="my_octagono_gps_filter" domain="[('user_id','=',uid)]"/>-->
+<!--                <filter string="Borradores" name="draft" domain="[('state','=','draft')]"/>-->
+<!--&lt;!&ndash;                <filter string="Registros enviados" name="sent" domain="[('state','=','sent')]"/>&ndash;&gt;-->
+<!--                <filter string="Registrados" name="registered" domain="[('state','=','registered')]"/>-->
+<!--                <filter string="Cancelados" name="canceled" domain="[('state','=','cancel')]" context="{'group_by':'partner_id'}"/>-->
+<!--                <filter string="Productos Asignados" name="registered" domain="[('state','=','assigned')]"/>-->
+<!--                <filter string="Confirmados" name="done" domain="[('state','=','done')]"/>-->
+<!--                <filter string="Registro Archivados" name="archived" domain="[('active', '=', 0)]"/>-->
+<!--                <separator/>-->
+<!--                <filter string="Mensajes no leídos" name="message_needaction" domain="[('message_needaction','=',True)]"/>-->
+<!--                <separator/>-->
+<!--                <filter string="Mis actividades" name="activities_my" domain="[('activity_ids.user_id', '=', uid)]"/>-->
+<!--                <separator/>-->
+<!--                <filter string="Actividades tardías" name="activities_overdue" domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]" help="Mostrar todos los registros que tienen la próxima fecha de acción antes de hoy"/>-->
+<!--                <filter string="Actividades de hoy" name="activities_today" domain="[('activity_ids.date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>-->
+<!--                <filter string="Actividades futuras" name="activities_upcoming_all" domain="[('activity_ids.date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>-->
 
-                <group expand="1" string="Group By">
-                    <filter string="Usuario" name="users" domain="[]" context="{'group_by':'user_id'}"/>
-                    <filter string="Propetario > Sin Cancelados" name="propetario" domain="[('state', '!=', 'cancel')]" context="{'group_by':'partner_id'}"/>
-                    <filter string="Cuenta" name="cuenta" domain="[]" context="{'group_by':'account'}"/>
-                    <filter string="GPS" name="gps_id" domain="[]" context="{'group_by':'gps_id'}"/>
-                    <filter string="Serial GPS" name="gps_lot_id" domain="[]" context="{'group_by':'gps_lot_id'}"/>
-                    <filter string="SIM" name="sim_id" domain="[]" context="{'group_by':'sim_id'}"/>
-                    <filter string="Serial SIM" name="sim_lot_id" domain="[]" context="{'group_by':'sim_lot_id'}"/>
-                    <filter string="Mes del registro" domain="[]" context="{'group_by':'date_order'}"/>
-                    <filter string="Fecha de creacion" name="create_date" domain="[]" context="{'group_by': 'create_date'}"/>
-                    <filter string="Fecha de confirmacion" name="create_date" domain="[]" context="{'group_by': 'confirmation_date'}"/>
-                </group>
-            </search>
-        </field>
-    </record>
+<!--                <group expand="1" string="Group By">-->
+<!--                    <filter string="Usuario" name="users" domain="[]" context="{'group_by':'user_id'}"/>-->
+<!--                    <filter string="Propetario > Sin Cancelados" name="propetario" domain="[('state', '!=', 'cancel')]" context="{'group_by':'partner_id'}"/>-->
+<!--                    <filter string="Cuenta" name="cuenta" domain="[]" context="{'group_by':'account'}"/>-->
+<!--                    <filter string="GPS" name="gps_id" domain="[]" context="{'group_by':'gps_id'}"/>-->
+<!--                    <filter string="Serial GPS" name="gps_lot_id" domain="[]" context="{'group_by':'gps_lot_id'}"/>-->
+<!--                    <filter string="SIM" name="sim_id" domain="[]" context="{'group_by':'sim_id'}"/>-->
+<!--                    <filter string="Serial SIM" name="sim_lot_id" domain="[]" context="{'group_by':'sim_lot_id'}"/>-->
+<!--                    <filter string="Mes del registro" domain="[]" context="{'group_by':'date_order'}"/>-->
+<!--                    <filter string="Fecha de creacion" name="create_date" domain="[]" context="{'group_by': 'create_date'}"/>-->
+<!--                    <filter string="Fecha de confirmacion" name="create_date" domain="[]" context="{'group_by': 'confirmation_date'}"/>-->
+<!--                </group>-->
+<!--            </search>-->
+<!--        </field>-->
+<!--    </record>-->
 
     <!--Octagono GPS Action Window-->
     <record id="action_octagono_gps" model="ir.actions.act_window">
@@ -353,7 +352,7 @@
         <field name="res_model">octagono.gps</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,kanban,form</field>
-        <field name="search_view_id" ref="view_octagono_gps_filter"/>
+<!--        <field name="search_view_id" ref="view_octagono_gps_filter"/>-->
         <field name="context">{"search_default_propetario": True,}</field>
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">
@@ -378,33 +377,33 @@
                 <field name="salesman_id"/>
                 <field name="product_uom_qty" string="Qty"/>
                 <field name="qty_delivered"/>
-                <field name="product_uom" string="Unit of Measure" groups="product.group_uom"/>
+                <field name="product_uom" string="Unit of Measure" groups="uom.group_uom"/>
                 <field name="route_id" options="{'no_create': True}" invisible="1"/>
                 <field name="is_gps" invisible="1"/>
             </tree>
         </field>
     </record>
 
-    <!--Octagono GPS Line Search View-->
-    <record id="view_octagono_gps_line_filter" model="ir.ui.view">
-        <field name="name">octagono.gps.line.select</field>
-        <field name="model">octagono.gps.line</field>
-        <field name="arch" type="xml">
-            <search string="Search Octagono GPS Line">
-                <filter string="My Octagono Order Lines" domain="[('salesman_id','=',uid)]"
-                        help="Octagono Order Lines related to a Sales Order of mine"/>
-                <field name="order_id"/>
-                <field name="order_partner_id" operator="child_of"/>
-                <field name="product_id"/>
-                <field name="salesman_id"/>
-                <group expand="0" string="Group By">
-                    <filter string="Product" domain="[]" context="{'group_by':'product_id'}"/>
-                    <filter string="Order" domain="[]" context="{'group_by':'order_id'}"/>
-                    <filter string="Usuario" domain="[]" context="{'group_by':'salesman_id'}"/>
-                </group>
-            </search>
-        </field>
-    </record>
+<!--    &lt;!&ndash;Octagono GPS Line Search View&ndash;&gt;-->
+<!--    <record id="view_octagono_gps_line_filter" model="ir.ui.view">-->
+<!--        <field name="name">octagono.gps.line.select</field>-->
+<!--        <field name="model">octagono.gps.line</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <search string="Search Octagono GPS Line">-->
+<!--                <filter string="My Octagono Order Lines" domain="[('salesman_id','=',uid)]"-->
+<!--                        help="Octagono Order Lines related to a Sales Order of mine"/>-->
+<!--                <field name="order_id"/>-->
+<!--                <field name="order_partner_id" operator="child_of"/>-->
+<!--                <field name="product_id"/>-->
+<!--                <field name="salesman_id"/>-->
+<!--                <group expand="0" string="Group By">-->
+<!--                    <filter string="Product" domain="[]" context="{'group_by':'product_id'}"/>-->
+<!--                    <filter string="Order" domain="[]" context="{'group_by':'order_id'}"/>-->
+<!--                    <filter string="Usuario" domain="[]" context="{'group_by':'salesman_id'}"/>-->
+<!--                </group>-->
+<!--            </search>-->
+<!--        </field>-->
+<!--    </record>-->
 
     <!--Octagono GPS Line Action Window-->
     <record id="action_product_octagono_list" model="ir.actions.act_window">
@@ -414,7 +413,7 @@
         <field name="view_mode">tree</field>
         <field name="context">{'search_default_product_id': [active_id], 'default_product_id': active_id}</field>
         <field name="domain">[('state', 'in', ['registered', 'done'])]</field>
-        <field name="search_view_id" ref="view_octagono_gps_line_filter"/>
+<!--        <field name="search_view_id" ref="view_octagono_gps_line_filter"/>-->
     </record>
 
     <!--================= MAIL ============-->
