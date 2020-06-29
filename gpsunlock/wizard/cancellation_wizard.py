@@ -20,7 +20,7 @@ class CancellationWizard(models.TransientModel):
                                             ('owner_change', 'Cambio de Dueño'), ('repair', 'Vehiculo en Reparacion'),
                                             ('contract_end', 'Finalizacion de Contrato')],
                                            string="Motivo de Cancelacion", required=True)
-    cancel_date = fields.Date(string="Fecha de Cancelación", default=datetime.today(), required=True)
+    cancel_date = fields.Date(string="Fecha de Cancelación", default=fields.Date.today(), required=True)
 
     @api.multi
     def return_action(self):

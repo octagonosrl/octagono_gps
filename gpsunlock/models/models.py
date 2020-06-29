@@ -67,7 +67,7 @@ class OctagonoGps(models.Model):
         new_picking.move_lines[1].move_line_ids[0].write({'lot_id': lot[1]})
 
         now = datetime.now().strftime("%Y%m%d%H%M%S")  # obtener la fecha en formato yyyymmddhhiiss
-        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        date = datetime.today().date()
         if self.vin_sn:
             self.vin_sn = self.vin_sn + "-" + now
         else:

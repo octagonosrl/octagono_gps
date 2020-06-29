@@ -739,19 +739,18 @@ class OctagonoGPSLine(models.Model):
         return super(OctagonoGPSLine, self).write(values)
 
     @api.multi
-    def _prepare_stock_values(self, group_id=False):
+    def _prepare_procurement_values(self, group_id=False):
         """ Prepare una clave específica para movimientos u otros componentes que se crearán a partir
         de una regla de adquisición procedente de una línea de orden de venta. Este método podría anularse
         para agregar otra clave personalizada que podría ser utilizado en la creación de movimiento / po.
         """
         self.ensure_one()
-        date_planned = datetime.strptime(self.order_id.confirmation_date, DEFAULT_SERVER_DATETIME_FORMAT) \
-                       + timedelta(days=self.customer_lead or 0.0)
+        date_planned = self.order_id.confirmation_date + timedelta(days=self.customer_lead or 0.0)
         values = {
             'company_id': self.order_id.company_id,
             'group_id': group_id,
             'octagono_line_id': self.id,
-            'date_planned': date_planned.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
+            'date_planned': date_planned,
             'route_ids': self.route_id or self.order_id.warehouse_id.route_ids,
             'warehouse_id': self.order_id.warehouse_id or False,
             'partner_dest_id': self.order_id.partner_shipping_id
