@@ -46,27 +46,28 @@ class OctagonoModel(models.Model):
         for record in self:
             # self.id
             if record.name:
-                ## record.name = record.name
-                # Obteniendo el id del modelo editado
-                id = self._origin.id
-                # nuevo nombre del modelo
-                model_name = record.name
-                # Actualizando el nombre del modelo
-                sql_upd_modelo = "update octagono_model set name='" + model_name + "' where id = " + str(id) + ";"
-                self.env.cr.execute(sql_upd_modelo)
-                # Buscando los vehiculos relacionados al modelo modificado
-                sql = "select id, name, model_id from octagono_gps where model_id = " + str(id) + ";"
-                self.env.cr.execute(sql)
-                res_all = self.env.cr.fetchall()
-                for v in res_all:
-                    # Creando el nuevo nombre del vehiculo
-                    veh_id = v[0]
-                    veh_name = (v[1]).split("/")
-                    new_veh_name = veh_name[0] + "/" + model_name + "/" + veh_name[2]
-                    # actualizando el nombre del vehiculo
-                    sql_update = "update octagono_gps set name = '" + new_veh_name + "' where id = " + str(veh_id) + ";"
-                    self.env.cr.execute(sql_update)
-                    logging.info(sql_update)
+                if self._origin:
+                    ## record.name = record.name
+                    # Obteniendo el id del modelo editado
+                    id = self._origin.id
+                    # nuevo nombre del modelo
+                    model_name = record.name
+                    # Actualizando el nombre del modelo
+                    sql_upd_modelo = "update octagono_model set name='" + model_name + "' where id = " + str(id) + ";"
+                    self.env.cr.execute(sql_upd_modelo)
+                    # Buscando los vehiculos relacionados al modelo modificado
+                    sql = "select id, name, model_id from octagono_gps where model_id = " + str(id) + ";"
+                    self.env.cr.execute(sql)
+                    res_all = self.env.cr.fetchall()
+                    for v in res_all:
+                        # Creando el nuevo nombre del vehiculo
+                        veh_id = v[0]
+                        veh_name = (v[1]).split("/")
+                        new_veh_name = veh_name[0] + "/" + model_name + "/" + veh_name[2]
+                        # actualizando el nombre del vehiculo
+                        sql_update = "update octagono_gps set name = '" + new_veh_name + "' where id = " + str(veh_id) + ";"
+                        self.env.cr.execute(sql_update)
+                        logging.info(sql_update)
 
     @api.model
     def create(self, vals):
