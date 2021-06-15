@@ -18,7 +18,9 @@ class CancellationWizard(models.TransientModel):
     vehicle_id = fields.Many2one('octagono.gps', 'Vehiculo', readonly=True, required=True)
     cancellation_reason = fields.Selection([('vehicle_change', 'Cambio de Vehiculo'), ('warranty', 'Garantia'),
                                             ('owner_change', 'Cambio de Dueño'), ('repair', 'Vehiculo en Reparacion'),
-                                            ('contract_end', 'Finalizacion de Contrato')],
+                                            ('contract_end', 'Finalizacion de Contrato'),
+                                            ('lost_device', 'Equipo Perdido'),
+                                            ('contract_end_lost_device', 'Finalización de contrato / Equipo Perdido')],
                                            string="Motivo de Cancelacion", required=True)
     cancel_date = fields.Date(string="Fecha de Cancelación", default=datetime.today(), required=True)
 
