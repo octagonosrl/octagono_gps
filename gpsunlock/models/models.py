@@ -10,9 +10,16 @@ class OctagonoGps(models.Model):
     _inherit = 'octagono.gps'
 
     cancel_date = fields.Date(string="Fecha de Cancelación")
-    cancellation_reason = fields.Selection([('vehicle_change', 'Cambio de Vehiculo'), ('warranty', 'Garantia'),
-                                            ('owner_change', 'Cambio de Dueño'), ('repair', 'Vehiculo en Reparacion'),
-                                            ('contract_end', 'Finalizacion de Contrato')], string="Motivo de Cancelacion")
+    cancellation_reason = fields.Selection([
+        ('vehicle_change', 'Cambio de Vehiculo'),
+        ('warranty', 'Garantia'),
+        ('owner_change', 'Cambio de Dueño'),
+        ('account_change', 'Cambio de Cuenta'),
+        ('repair', 'Vehiculo en Reparacion'),
+        ('contract_end', 'Finalizacion de Contrato'),
+        ('lost_device', 'Equipo Perdido'),
+        ('contract_end_lost_device', 'Finalización de contrato / Equipo Perdido')
+    ], string="Motivo de Cancelacion")
 
     @api.multi
     def _prepare_move_default_values(self, return_line, new_picking):
