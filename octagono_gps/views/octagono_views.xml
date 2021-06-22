@@ -83,6 +83,7 @@
                 <field name="vin_sn"/>
                 <field name="license_plate"/>
                 <field name="currency_id" invisible="1"/>
+                <field name="select_period"/>
                 <field name="state"/>
             </tree>
         </field>
@@ -317,9 +318,8 @@
                 <filter string="Borradores" name="draft" domain="[('state','=','draft')]"/>
 <!--                <filter string="Registros enviados" name="sent" domain="[('state','=','sent')]"/>-->
                 <filter string="Registrados" name="registered" domain="[('state','=','registered')]"/>
+                <filter string="Asignados" name="done" domain="[('state','=','done')]"/>
                 <filter string="Cancelados" name="canceled" domain="[('state','=','cancel')]" context="{'group_by':'partner_id'}"/>
-                <filter string="Productos Asignados" name="registered" domain="[('state','=','assigned')]"/>
-                <filter string="Confirmados" name="done" domain="[('state','=','done')]"/>
                 <filter string="Registro Archivados" name="archived" domain="[('active', '=', 0)]"/>
                 <separator/>
                 <filter string="Mensajes no leídos" name="message_needaction" domain="[('message_needaction','=',True)]"/>
@@ -332,7 +332,7 @@
 
                 <group expand="1" string="Group By">
                     <filter string="Usuario" name="users" domain="[]" context="{'group_by':'user_id'}"/>
-                    <filter string="Propetario > Sin Cancelados" name="propetario" domain="[('state', '!=', 'cancel')]" context="{'group_by':'partner_id'}"/>
+                    <filter string="Propetario" name="propetario" domain="[]" context="{'group_by':'partner_id'}"/>
                     <filter string="Cuenta" name="cuenta" domain="[]" context="{'group_by':'account'}"/>
                     <filter string="GPS" name="gps_id" domain="[]" context="{'group_by':'gps_id'}"/>
                     <filter string="Serial GPS" name="gps_lot_id" domain="[]" context="{'group_by':'gps_lot_id'}"/>
@@ -357,7 +357,7 @@
         <field name="view_type">form</field>
         <field name="view_mode">tree,kanban,form</field>
         <field name="search_view_id" ref="view_octagono_gps_filter"/>
-        <field name="context">{"search_default_propetario": True,}</field>
+        <field name="context">{"search_default_propetario": True, "search_default_done": True}</field>
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">
                 Crea un nuevo registro, el primer paso para registrar un vehiculo.
