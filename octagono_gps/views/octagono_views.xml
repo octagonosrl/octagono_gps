@@ -339,6 +339,9 @@
                     <filter string="SIM" name="sim_id" domain="[]" context="{'group_by':'sim_id'}"/>
                     <filter string="Serial SIM" name="sim_lot_id" domain="[]" context="{'group_by':'sim_lot_id'}"/>
                     <filter string="Mes del registro" domain="[]" context="{'group_by':'date_order'}"/>
+                    <filter string="Ciclo" domain="[]" context="{'group_by':'select_period'}"/>
+                    <filter string="Instalador" domain="[]" context="{'group_by':'installer_id'}"/>
+                    <filter string="Conduce" domain="[]" context="{'group_by':'num_conduce'}"/>
                     <filter string="Fecha de creacion" name="create_date" domain="[]" context="{'group_by': 'create_date'}"/>
                     <filter string="Fecha de confirmacion" name="create_date" domain="[]" context="{'group_by': 'confirmation_date'}"/>
                 </group>
