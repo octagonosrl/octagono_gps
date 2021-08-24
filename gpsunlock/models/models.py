@@ -40,13 +40,13 @@ class OctagonoGps(models.Model):
 
     def _create_returns(self, cancellation_reason):
         # create new picking for returned products
-        lot = []
+        lot = {}
         lines = []
 
         picking_type_id = self.picking_ids[0].picking_type_id.return_picking_type_id.id or self.picking_ids[0].picking_type_id.id
 
         for line in self.order_line:
-            lot.append(line.product_lot_id.id)
+            lot[str(line.product_id.id)] = line.product_lot_id.id
             lines.append((0, 0, {
                         'partner_id': self.partner_id.id,
                         'product_id': line.product_id.id,
@@ -69,9 +69,12 @@ class OctagonoGps(models.Model):
         new_picking.message_post_with_view('mail.message_origin_link',
             values={'self': new_picking, 'origin': self.picking_ids[0]},
             subtype_id=self.env.ref('mail.mt_note').id)
+        for line in new_picking.move_lines:
+            line.move_line_ids[0].write({'lot_id': lot[str(line.product_id.id)]})
 
-        new_picking.move_lines[0].move_line_ids[0].write({'lot_id': lot[0]})
-        new_picking.move_lines[1].move_line_ids[0].write({'lot_id': lot[1]})
+
+        # new_picking.move_lines[0].move_line_ids[0].write({'lot_id': lot[0]})
+        # new_picking.move_lines[1].move_line_ids[0].write({'lot_id': lot[1]})
 
         now = datetime.now().strftime("%Y%m%d%H%M%S")  # obtener la fecha en formato yyyymmddhhiiss
         date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
