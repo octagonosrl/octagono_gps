@@ -1,44 +1,52 @@
 <odoo>
-  <data>
-    <record model="ir.ui.view" id="return_products">
-      <field name="name">picking_return_products</field>
-      <field name="model">octagono.gps</field>
-      <field name="inherit_id" ref="octagono_gps.view_octagono_gps_form"/>
-      <field name="arch" type="xml">
-        <button name="action_unlock" position="after">
-          <button name="create_returns" class="oe_button oe_form_button oe_highlight" type="object" string="Retornar Productos" attrs="{'invisible': [('state','in',['cancel', 'draft', 'sent', 'assigned', 'registered', 'valid_product'])]}" groups="octagono_gps.group_octagono_gps_manager"/>
-        </button>
-        <button name="create_returns" position="after">
-          <button name="%(action_view_map)d" id="see_on_map" type="action" string="Ver vehiculo en mapa" help="Abre el mapa para ver la ultima ubicacion del vehiculo." context="{'open_so': True}" attrs="{'invisible': [('state','in',['cancel'])]}"/>
-        </button>
-        <xpath expr="//button[@name='action_draft']" position="attributes">
-          <attribute name="invisible">1</attribute>
-        </xpath>
-        <xpath expr="//button[@name='action_cancel']" position="attributes">
-          <attribute name="states">{'invisible': [('state','in',['assigned','cancel','draft','registered'])]}</attribute>
-        </xpath>
-        <xpath expr="//button[@name='action_unlock']" position="attributes">
-          <attribute name="invisible">1</attribute>
-        </xpath>
-        <xpath expr="//button[@name='action_done']" position="attributes">
-          <attribute name="invisible">1</attribute>
-        </xpath>
-        <xpath expr="//field[@name='partner_id']" position="attributes">
-          <attribute name="attrs">{'readonly': [('state','in',['cancel','done','registered','assigned'])]}</attribute>
-        </xpath>
-        <xpath expr="//field[@name='install_date']" position="attributes">
-          <attribute name="attrs">{'readonly': [('state','in',['cancel'])]}</attribute>
-        </xpath>
-        <xpath expr="//field[@name='order_line']" position="attributes">
-          <attribute name="attrs">{'readonly': [('state','in',['cancel','done','registered','assigned'])]}</attribute>
-        </xpath>
-        <xpath expr="//field[@name='install_date']" position="after">
-            <field name="cancel_date" attrs="{'invisible': [('state', '!=', 'cancel')]}"/>
-            <field name="cancellation_reason" attrs="{'invisible': [('state', '!=', 'cancel')]}"/>
-        </xpath>
+    <data>
+        <record model="ir.ui.view" id="return_products">
+            <field name="name">picking_return_products</field>
+            <field name="model">octagono.gps</field>
+            <field name="inherit_id" ref="octagono_gps.view_octagono_gps_form"/>
+            <field name="arch" type="xml">
+                <button name="action_unlock" position="after">
+                    <button name="create_returns" class="oe_button oe_form_button oe_highlight" type="object"
+                            string="Retornar Productos"
+                            attrs="{'invisible': [('state','in',['cancel', 'draft', 'sent', 'assigned', 'registered', 'valid_product'])]}"
+                            groups="octagono_gps.group_octagono_gps_manager"/>
+                </button>
+                <button name="create_returns" position="after">
+                    <button name="%(action_view_map)d" id="see_on_map" type="action" string="Ver vehiculo en mapa"
+                            help="Abre el mapa para ver la ultima ubicacion del vehiculo." context="{'open_so': True}"
+                            attrs="{'invisible': [('state','in',['cancel'])]}"/>
+                </button>
+                <xpath expr="//button[@name='action_draft']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_cancel']" position="attributes">
+                    <attribute name="states">{'invisible':
+                        [('state','in',['assigned','cancel','draft','registered'])]}</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_unlock']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_done']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="attrs">{
+                        'readonly': [('state', 'in', ['cancel', 'done', 'registered', 'assigned'])]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='install_date']" position="attributes">
+                    <attribute name="attrs">{'readonly': [('state', 'in', ['cancel'])]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']" position="attributes">
+                    <attribute name="attrs">{
+                        'readonly': [('state', 'in', ['cancel', 'done', 'registered', 'assigned'])]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='install_date']" position="after">
+                    <field name="cancel_date" attrs="{'invisible': [('state', '!=', 'cancel')]}"/>
+                    <field name="cancellation_reason" attrs="{'invisible': [('state', '!=', 'cancel')]}"/>
+                </xpath>
 
-      </field>
-    </record>
+            </field>
+        </record>
 
-  </data>
+    </data>
 </odoo>

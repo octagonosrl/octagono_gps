@@ -1,4 +1,3 @@
-
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.tools.float_utils import float_compare, float_is_zero
@@ -42,22 +41,24 @@ class OctagonoGps(models.Model):
         # create new picking for returned products
         lot = {}
         lines = []
-
-        picking_type_id = self.picking_ids[0].picking_type_id.return_picking_type_id.id or self.picking_ids[0].picking_type_id.id
+        picking_type_id = self.env['stock.picking.type'].search([('is_for_gps_return', '=', True)], limit=1).id
+        if not picking_type_id:
+            picking_type_id = self.picking_ids[0].picking_type_id.return_picking_type_id.id or self.picking_ids[
+                0].picking_type_id.id
 
         for line in self.order_line:
             lot[str(line.product_id.id)] = line.product_lot_id.id
             lines.append((0, 0, {
-                        'partner_id': self.partner_id.id,
-                        'product_id': line.product_id.id,
-                        'product_lot_id': line.product_lot_id.id,
-                        'name': line.product_id.name,
-                        'product_uom': line.product_id.uom_id.id,
-                        'product_uom_qty': line.product_uom_qty,
-                        'quantity_done': line.qty_delivered,
-                        'octagono_line_id': line.id,
-                        'order_id': self.id,
-             }))
+                'partner_id': self.partner_id.id,
+                'product_id': line.product_id.id,
+                'product_lot_id': line.product_lot_id.id,
+                'name': line.product_id.name,
+                'product_uom': line.product_id.uom_id.id,
+                'product_uom_qty': line.product_uom_qty,
+                'quantity_done': line.qty_delivered,
+                'octagono_line_id': line.id,
+                'order_id': self.id,
+            }))
 
         new_picking = self.picking_ids[0].copy({
             'move_lines': lines,
@@ -67,11 +68,10 @@ class OctagonoGps(models.Model):
             'location_id': self.picking_ids[0].location_dest_id.id,
             'location_dest_id': self.picking_ids[0].location_id.id})
         new_picking.message_post_with_view('mail.message_origin_link',
-            values={'self': new_picking, 'origin': self.picking_ids[0]},
-            subtype_id=self.env.ref('mail.mt_note').id)
+                                           values={'self': new_picking, 'origin': self.picking_ids[0]},
+                                           subtype_id=self.env.ref('mail.mt_note').id)
         for line in new_picking.move_lines:
             line.move_line_ids[0].write({'lot_id': lot[str(line.product_id.id)]})
-
 
         # new_picking.move_lines[0].move_line_ids[0].write({'lot_id': lot[0]})
         # new_picking.move_lines[1].move_line_ids[0].write({'lot_id': lot[1]})

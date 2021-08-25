@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# Part of Softhealer Technologies.
 from odoo import api, fields, models, _
 from datetime import datetime
 
@@ -32,4 +31,3 @@ class CancellationWizard(models.TransientModel):
     def return_action(self):
         vehicle = self.vehicle_id
         vehicle._create_returns(self.cancellation_reason)
-

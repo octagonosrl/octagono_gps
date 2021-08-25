@@ -1,0 +1,14 @@
+<odoo>
+    <data>
+        <record id="view_picking_type_form_inherit_gpsunlock" model="ir.ui.view">
+            <field name="name">view_picking_type_form_inherit_gpsunlock</field>
+            <field name="model">stock.picking.type</field>
+            <field name="inherit_id" ref="stock.view_picking_type_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='show_reserved']" position="after">
+                    <field name="is_for_gps_return"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

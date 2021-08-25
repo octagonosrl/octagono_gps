@@ -27,6 +27,7 @@
         'wizard/cancellation_wizard_view.xml',
         'views/views.xml',
         'views/invibuttons.xml',
+        'views/stock_picking_type_views.xml',
         # 'static/src/js/gpsunlock.js',
     ],
     'images': ['static/image/loader_car.gif'],
