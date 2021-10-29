@@ -71,6 +71,8 @@ class OctagonoGPS(models.Model):
     create_date = fields.Datetime(string='Creation Date', readonly=True, index=True, help="Date on which sales order is created.")
     confirmation_date = fields.Datetime(string='Fecha de confirmación', readonly=True, index=True, copy=False,
                                         help=u"Fecha de confirmación.", oldname="date_confirm")
+    billing_date = fields.Datetime(string='Fecha de facturación', index=True)
+    next_billing_date = fields.Datetime(string='Próxima fecha de factura', index=True)
     user_id = fields.Many2one('res.users', string='Usuario', index=True, track_visibility='onchange',
                               default=lambda self: self.env.user)
     partner_id = fields.Many2one('res.partner', string='Propetario', required=True, change_default=True, index=True, track_visibility='onchange')
