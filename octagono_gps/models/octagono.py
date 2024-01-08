@@ -136,7 +136,7 @@ class OctagonoGPS(models.Model):
     is_waiting = fields.Boolean(compute="_compute_is_waiting")
     is_assign = fields.Boolean(compute="_compute_is_assign")
     p_installation = fields.Many2many('octagono.gps.tags', 'octagono_gps_tags_rel', string="P. Instalacion")
-    select_period = fields.Selection([('monthly', 'Mensual'), ('annual', 'Anual'), ('biannual', 'BiAnual')], index=True, default='monthly', track_visibility="onchange")
+    select_period = fields.Selection([('monthly', 'Mensual'), ('annual', 'Anual'), ('biannual', 'BiAnual'), ('triannual', 'TriAnual')], index=True, default='monthly', track_visibility="onchange")
     phone_driver = fields.Char(string='Te. Responsable')
     num_conduce = fields.Char(string='Num. Conduce')
 
