@@ -20,6 +20,7 @@
         'data/gps_data.xml',
         'data/gps_colors_data.xml',
         'views/stock_picking_relation.xml',
+        'views/account_invoice_tree.xml',
     ],
     'demo': [],
     'application': True,

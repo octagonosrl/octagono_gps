@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_invoice_line_form_inherit_account" model="ir.ui.view">
+        <field name="name">account.move.tree.account</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="account"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

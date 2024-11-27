@@ -58,5 +58,17 @@
                 </button>
             </field>
         </record>
+
+        <record id="view_partner_form_inherit_account" model="ir.ui.view">
+            <field name="name">res.partner.form.account</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='phone']" position="after">
+                    <field name="x_studio_field_ddQ6z"/>
+                </xpath>
+            </field>
+        </record>
+
     </data>
 </odoo>
