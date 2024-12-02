@@ -7,17 +7,6 @@
                   action="base.action_partner_form"
                   sequence="3"/>
 
-        <record id="res_partner_view_fields" model="ir.ui.view">
-            <field name="name">res.partner.view.fields</field>
-            <field name="model">res.partner</field>
-            <field name="inherit_id" ref="base.view_partner_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='function']" position="before">
-                    <field name="octagono_gps_account"/>
-                </xpath>
-            </field>
-        </record>
-
         <record id="act_res_partner_2_octagono_gps" model="ir.actions.act_window">
             <field name="name">Registros de Octagono</field>
             <field name="res_model">octagono.gps</field>
@@ -69,5 +58,17 @@
                 </button>
             </field>
         </record>
+
+        <record id="view_partner_form_inherit_account" model="ir.ui.view">
+            <field name="name">res.partner.form.account</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='phone']" position="after">
+                    <field name="x_studio_field_ddQ6z"/>
+                </xpath>
+            </field>
+        </record>
+
     </data>
 </odoo>

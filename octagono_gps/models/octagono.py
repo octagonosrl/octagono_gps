@@ -23,7 +23,7 @@ class OctagonoGPS(models.Model):
     _sql_constraints = [
         ('octagono_gps_vin_sn_unique', 'unique(vin_sn)', 'La numeracion del chasis ya existe.')
     ]
-    account = fields.Char(related="partner_id.octagono_gps_account", store=True)
+    account = fields.Char(related="partner_id.x_studio_field_ddQ6z", store=True)
 
     @api.model
     def get_empty_list_help(self, help):
@@ -71,6 +71,8 @@ class OctagonoGPS(models.Model):
     create_date = fields.Datetime(string='Creation Date', readonly=True, index=True, help="Date on which sales order is created.")
     confirmation_date = fields.Datetime(string='Fecha de confirmación', readonly=True, index=True, copy=False,
                                         help=u"Fecha de confirmación.", oldname="date_confirm")
+    billing_date = fields.Datetime(string='Fecha de facturación', index=True)
+    next_billing_date = fields.Datetime(string='Próxima fecha de factura', index=True)
     user_id = fields.Many2one('res.users', string='Usuario', index=True, track_visibility='onchange',
                               default=lambda self: self.env.user)
     partner_id = fields.Many2one('res.partner', string='Propetario', required=True, change_default=True, index=True, track_visibility='onchange')
@@ -118,6 +120,10 @@ class OctagonoGPS(models.Model):
     model_id = fields.Many2one('octagono.model', "Modelo", help="Model of the vehicle", track_visibility="onchange")
     model_year = fields.Selection(selection='gen_date_select', string="Año del modelo", track_visibility="onchange")
     vin_sn = fields.Char("Num. Chasis", track_visibility="onchange")
+    incoterm = fields.Many2one(
+        'account.incoterms', 'Incoterms',
+        help="International Commercial Terms are a series of predefined "
+             "commercial terms used in international transactions.", track_visibility="onchange")
     picking_policy = fields.Selection([
         ('direct', 'Entregar cada producto cuando esté disponible'),
         ('one', 'Entregar todos los productos a la vez')],
@@ -130,7 +136,7 @@ class OctagonoGPS(models.Model):
     is_waiting = fields.Boolean(compute="_compute_is_waiting")
     is_assign = fields.Boolean(compute="_compute_is_assign")
     p_installation = fields.Many2many('octagono.gps.tags', 'octagono_gps_tags_rel', string="P. Instalacion")
-    select_period = fields.Selection([('monthly', 'Mensual'), ('annual', 'Anual')], index=True, default='monthly', track_visibility="onchange")
+    select_period = fields.Selection([('monthly', 'Mensual'), ('annual', 'Anual'), ('biannual', 'BiAnual'), ('triannual', 'TriAnual')], index=True, default='monthly', track_visibility="onchange")
     phone_driver = fields.Char(string='Te. Responsable')
     num_conduce = fields.Char(string='Num. Conduce')
 
@@ -355,7 +361,7 @@ class OctagonoGPS(models.Model):
         #     self.force_quotation_send()
 
         for order in self:
-            order.order_line._action_launch_stock_rule()
+            order.order_line._action_launch_procurement_rule()
 
         return True
 
@@ -681,7 +687,7 @@ class OctagonoGPSLine(models.Model):
             msg = _("Extra line with %s ") % (line.product_id.display_name,)
             line.order_id.message_post(body=msg)
             # si el state es registered invocamos la funcion encargada del movimiento de stock
-            line._action_launch_stock_rule()
+            line._action_launch_procurement_rule()
         return line
 
     def _update_line_quantity(self, values):
@@ -734,7 +740,7 @@ class OctagonoGPSLine(models.Model):
                 lambda r: r.state == 'registered' and float_compare(r.product_uom_qty, values['product_uom_qty'],
                                                                     precision_digits=precision) == -1)
 
-            lines._action_launch_stock_rule()
+            lines._action_launch_procurement_rule()
 
         return super(OctagonoGPSLine, self).write(values)
 
@@ -750,7 +756,7 @@ class OctagonoGPSLine(models.Model):
             'company_id': self.order_id.company_id,
             'group_id': group_id,
             'octagono_line_id': self.id,
-            'date_planned': date_planned,
+            'date_planned': date_planned.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
             'route_ids': self.route_id or self.order_id.warehouse_id.route_ids,
             'warehouse_id': self.order_id.warehouse_id or False,
             'partner_dest_id': self.order_id.partner_shipping_id
@@ -973,7 +979,7 @@ class OctagonoGPSLine(models.Model):
         return {}
 
     @api.multi
-    def _action_launch_stock_rule(self):
+    def _action_launch_procurement_rule(self):
         """Inicie el método de ejecución del grupo de compras con campos requeridos / personalizados generados por un
          línea de orden de venta. El grupo de compras lanzará '_run_move', '_run_buy' o '_run_manufacture'
          dependiendo de la regla del producto de la línea de orden de venta.
@@ -1054,7 +1060,7 @@ class OctagonoGPSLine(models.Model):
 
         # Check Drop-Shipping
         if not is_available:
-            for pull_rule in product_routes.mapped('rule_ids'):
+            for pull_rule in product_routes.mapped('pull_ids'):
                 if pull_rule.picking_type_id.sudo().default_location_src_id.usage == 'supplier' and \
                                 pull_rule.picking_type_id.sudo().default_location_dest_id.usage == 'customer':
                     is_available = True

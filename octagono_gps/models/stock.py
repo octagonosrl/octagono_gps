@@ -13,7 +13,7 @@ class StockLocationRoute(models.Model):
 
 class StockMove(models.Model):
     _inherit = "stock.move"
-    octagono_line_id = fields.Many2one('octagono.gps.line', 'Octagono Line')
+    octagono_line_id = fields.Many2one('octagono.gps.line', string='Octagono Line')
 
     @api.model
     def _prepare_merge_moves_distinct_fields(self):
@@ -61,14 +61,14 @@ class StockMove(models.Model):
 class ProcurementGroup(models.Model):
     _inherit = 'procurement.group'
 
-    octagono_id = fields.Many2one('octagono.gps', 'Octagono GPS')
+    octagono_id = fields.Many2one('octagono.gps', string='Octagono GPS')
 
 
-class StockRule(models.Model):
+class ProcurementRule(models.Model):
     _inherit = 'stock.rule'
 
     def _get_stock_move_values(self, product_id, product_qty, product_uom, location_id, name, origin, values, group_id):
-        result = super(StockRule, self)._get_stock_move_values(product_id, product_qty, product_uom, location_id,
+        result = super(ProcurementRule, self)._get_stock_move_values(product_id, product_qty, product_uom, location_id,
                                                                      name, origin, values, group_id)
         if values.get('octagono_line_id', False):
             result['octagono_line_id'] = values['octagono_line_id']
@@ -78,7 +78,7 @@ class StockRule(models.Model):
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
-    octagono_id = fields.Many2one('octagono.gps', 'Octagono GPS', related='move_lines.octagono_line_id.order_id',
+    octagono_id = fields.Many2one('octagono.gps', string='Octagono GPS', related='move_lines.octagono_line_id.order_id',
                                   readonly=True, store=True)
 
 

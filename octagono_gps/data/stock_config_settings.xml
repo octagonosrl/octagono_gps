@@ -1,0 +1,5 @@
+<odoo>
+    <record id="product_traceability_setting" model="res.config.settings">
+        <field name="group_stock_production_lot" eval="True"/>
+    </record>
+</odoo>
