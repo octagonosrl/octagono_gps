@@ -78,8 +78,8 @@ class StockRule(models.Model):
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
-    octagono_id = fields.Many2one('octagono.gps', 'Octagono GPS', related='move_lines.octagono_line_id.order_id',
-                                  readonly=True, store=True)
+    # octagono_id = fields.Many2one('octagono.gps', 'Octagono GPS', related='move_lines.octagono_line_id.order_id',
+    #                               readonly=True, store=True)
 
 
 class ReturnPicking(models.TransientModel):
