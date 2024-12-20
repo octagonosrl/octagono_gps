@@ -124,7 +124,7 @@ class OctagonoGPS(models.Model):
         string='Shipping Policy', required=True, readonly=True, default='direct',
         states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, track_visibility="onchange")
     warehouse_id = fields.Many2one('stock.warehouse', string='Warehouse', required=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, default=_default_warehouse_id, track_visibility="onchange")
-    picking_ids = fields.One2many('stock.picking', 'octagono_id', string='Pickings')
+    # picking_ids = fields.One2many('stock.picking', 'octagono_id', string='Pickings')
     delivery_count = fields.Integer(string='Delivery Orders', compute='_compute_picking_ids')
     procurement_group_id = fields.Many2one('procurement.group', 'Procurement Group', copy=False)
     is_waiting = fields.Boolean(compute="_compute_is_waiting")
@@ -991,23 +991,23 @@ class OctagonoGPSLine(models.Model):
                 continue
 
             group_id = line.order_id.procurement_group_id
-            if not group_id:
-                group_id = self.env['procurement.group'].create({
-                    'name': line.order_id.name, 'move_type': line.order_id.picking_policy,
-                    'octagono_id': line.order_id.id,
-                    'partner_id': line.order_id.partner_shipping_id.id,
-                })
-                line.order_id.procurement_group_id = group_id
-            else:
-                # In case the procurement group is already created and the order was
-                # cancelled, we need to update certain values of the group.
-                updated_vals = {}
-                if group_id.partner_id != line.order_id.partner_shipping_id:
-                    updated_vals.update({'partner_id': line.order_id.partner_shipping_id.id})
-                if group_id.move_type != line.order_id.picking_policy:
-                    updated_vals.update({'move_type': line.order_id.picking_policy})
-                if updated_vals:
-                    group_id.write(updated_vals)
+            # if not group_id:
+            #     group_id = self.env['procurement.group'].create({
+            #         'name': line.order_id.name, 'move_type': line.order_id.picking_policy,
+            #         'octagono_id': line.order_id.id,
+            #         'partner_id': line.order_id.partner_shipping_id.id,
+            #     })
+            #     line.order_id.procurement_group_id = group_id
+            # else:
+            #     # In case the procurement group is already created and the order was
+            #     # cancelled, we need to update certain values of the group.
+            #     updated_vals = {}
+            #     if group_id.partner_id != line.order_id.partner_shipping_id:
+            #         updated_vals.update({'partner_id': line.order_id.partner_shipping_id.id})
+            #     if group_id.move_type != line.order_id.picking_policy:
+            #         updated_vals.update({'move_type': line.order_id.picking_policy})
+            #     if updated_vals:
+            #         group_id.write(updated_vals)
 
             values = line._prepare_procurement_values(group_id=group_id)
             product_qty = line.product_uom_qty - qty
