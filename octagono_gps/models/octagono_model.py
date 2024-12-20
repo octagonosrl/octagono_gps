@@ -17,7 +17,7 @@ class OctagonoModel(models.Model):
                                string='Make',
                                required=True,
                                help='Make of the vehicle')
-    image = fields.Binary(related='brand_id.image', string="Logo")
+    #image = fields.Binary(related='brand_id.image', string="Logo")
     image_medium = fields.Binary(related='brand_id.image_medium', string="Logo (medium)")
     image_small = fields.Binary(related='brand_id.image_small', string="Logo (small)")
 

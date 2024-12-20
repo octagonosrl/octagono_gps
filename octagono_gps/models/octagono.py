@@ -109,7 +109,7 @@ class OctagonoGPS(models.Model):
     blocking_type = fields.Selection(selection=[('b0', 'B0'), ('b1', 'B1'), ('b2', 'B2'), ('b3', 'B3')], string="Tipo de bloqueo")
     color = fields.Many2one('octagono.gps.colors', track_visibility="onchange")
     driver = fields.Char('Responsable', track_visibility="onchange")
-    image = fields.Binary(related='model_id.image', string="Logo")
+    #image = fields.Binary(related='model_id.image', string="Logo")
     image_medium = fields.Binary(related='model_id.image_medium', string="Logo (medium)")
     image_small = fields.Binary(related='model_id.image_small', string="Logo (small)")
     license_plate = fields.Char('Matricula', track_visibility='onchange', help="Numero de matriculo o placa del vehiculo")
