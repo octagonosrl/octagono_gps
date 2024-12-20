@@ -73,7 +73,7 @@ class OctagonoGPS(models.Model):
                                         help=u"Fecha de confirmación.", oldname="date_confirm")
     user_id = fields.Many2one('res.users', string='Usuario', index=True, track_visibility='onchange',
                               default=lambda self: self.env.user)
-    partner_id = fields.Many2one('res.partner', string='Propetario', required=True, change_default=True, index=True, track_visibility='onchange')
+    # partner_id = fields.Many2one('res.partner', string='Propetario', required=True, change_default=True, index=True, track_visibility='onchange')
     partner_name = fields.Char(related='partner_id.name')
     partner_invoice_id = fields.Many2one('res.partner', string='Invoice Address', readonly=True, required=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Invoice address for current sales order.")
     partner_shipping_id = fields.Many2one('res.partner', string='Dirección de entrega', readonly=True, required=True,  states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Delivery address for current sales order.")

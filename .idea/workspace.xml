@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d0a315f7-a4ff-4bf3-9879-38d3c242b8bc" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/octagono_gps/models/stock.py" beforeDir="false" afterPath="$PROJECT_DIR$/octagono_gps/models/stock.py" afterDir="false" />
-    </list>
+    <list default="true" id="d0a315f7-a4ff-4bf3-9879-38d3c242b8bc" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
