@@ -6,7 +6,7 @@ class ResPartner(models.Model):
     _inherit = 'res.partner'
 
     octagono_gps_count = fields.Integer(compute='_compute_octagono_gps_count', string='# of Vehiculos')
-    octagono_gps_ids = fields.One2many('octagono.gps', 'partner_id', 'Octagono GPS')
+    #octagono_gps_ids = fields.One2many('octagono.gps', 'partner_id', 'Octagono GPS')
     octagono_gps_account = fields.Char(string="Cuenta Sistema GPS")
 
     def _compute_octagono_gps_count(self):
