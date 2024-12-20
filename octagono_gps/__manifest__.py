@@ -10,7 +10,7 @@
     'depends': ['base', 'mail', 'account', 'portal', 'hr', 'stock'],
     'data': [
         'security/octagono_gps_groups.xml',
-        'security/ir.model.access.csv',
+        # 'security/ir.model.access.csv',
         'views/octagono_views.xml',
         'views/octagono_model_views.xml',
         'views/product_views.xml',
