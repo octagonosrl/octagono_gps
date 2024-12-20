@@ -5,8 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d0a315f7-a4ff-4bf3-9879-38d3c242b8bc" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/octagono_gps/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/octagono_gps/models/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/octagono_gps/models/res_partner.py" beforeDir="false" afterPath="$PROJECT_DIR$/octagono_gps/models/res_partner.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
