@@ -61,7 +61,7 @@ class StockMove(models.Model):
 class ProcurementGroup(models.Model):
     _inherit = 'procurement.group'
 
-    octagono_id = fields.Many2one('octagono.gps', 'Octagono GPS')
+    # octagono_id = fields.Many2one('octagono.gps', 'Octagono GPS')
 
 
 class StockRule(models.Model):
