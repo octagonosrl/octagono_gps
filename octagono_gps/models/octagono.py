@@ -146,14 +146,14 @@ class OctagonoGPS(models.Model):
     def _get_customer_lead(self, product_tmpl_id):
         return False
 
-    @api.multi
+    @api.model
     def unlink(self):
         for order in self:
             if order.state not in ('draft', 'cancel'):
                 raise UserError(_('You can not delete a sent quotation or a sales order! Try to cancel it before.'))
         return super(OctagonoGPS, self).unlink()
 
-    # @api.multi
+    # @api.model
     # def _track_subtype(self, init_values):
     #     self.ensure_one()
     #     if 'state' in init_values and self.state == 'registered':
@@ -162,14 +162,14 @@ class OctagonoGPS(models.Model):
     #         return 'octagono_gps.mt_register_sent'
     #     return super(OctagonoGPS, self)._track_subtype(init_values)
 
-    @api.multi
+    @api.model
     @api.onchange('partner_shipping_id', 'partner_id')
     def onchange_partner_shipping_id(self):
         self.fiscal_position_id = self.env['account.fiscal.position'].get_fiscal_position(self.partner_id.id,
                                                                                           self.partner_shipping_id.id)
         return {}
 
-    @api.multi
+    @api.model
     @api.onchange('partner_id')
     def onchange_partner_id(self):
         """
@@ -261,7 +261,7 @@ class OctagonoGPS(models.Model):
 
         return super(OctagonoGPS, self).create(vals)
 
-    @api.multi
+    @api.model
     def copy_data(self, default=None):
         if default is None:
             default = {}
@@ -271,20 +271,20 @@ class OctagonoGPS(models.Model):
         default['vin_sn'] = (self.vin_sn.split('-', 1))[0]
         return super(OctagonoGPS, self).copy_data(default)
 
-    @api.multi
+    @api.model
     def action_draft(self):
         orders = self.filtered(lambda s: s.state in ['cancel', 'sent'])
         return orders.write({
             'state': 'draft',
         })
 
-    @api.multi
+    @api.model
     def action_cancel(self):
         self.mapped('picking_ids').action_cancel()
         return self.write({'state': 'cancel'})
 
     # Observacion
-    # @api.multi
+    # @api.model
     # def action_quotation_send(self):
     #     """
     #     This function opens a window to compose an email, with the edi sale template message loaded by default
@@ -322,7 +322,7 @@ class OctagonoGPS(models.Model):
     #     }
 
     # observacion
-    # @api.multi
+    # @api.model
     # def force_quotation_send(self):
     #     for order in self:
     #         email_act = order.action_quotation_send()
@@ -332,15 +332,15 @@ class OctagonoGPS(models.Model):
     #             order.with_context(email_ctx).message_post_with_template(email_ctx.get('default_template_id'))
     #     return True
 
-    @api.multi
+    @api.model
     def action_done(self):
         return self.write({'state': 'done'})
 
-    @api.multi
+    @api.model
     def action_unlock(self):
         return self.write({'state': 'registered'})
 
-    @api.multi
+    @api.model
     def _action_confirm(self):
         # for order in self.filtered(lambda order: order.partner_id not in order.message_partner_ids):
         #     order.message_subscribe([order.partner_id.id])
@@ -359,12 +359,12 @@ class OctagonoGPS(models.Model):
 
         return True
 
-    @api.multi
+    @api.model
     def action_confirm(self):
         self._action_confirm()
         return True
     
-    @api.multi
+    @api.model
     def toggle_suspension(self):
         if self.state == 'suspended':
             self.write({'state': 'done'})
@@ -375,7 +375,7 @@ class OctagonoGPS(models.Model):
 
 
     # observacion
-    @api.multi
+    @api.model
     def _get_tax_amount_by_group(self):
         self.ensure_one()
         res = {}
@@ -395,7 +395,7 @@ class OctagonoGPS(models.Model):
         return res
 
     # observacion
-    @api.multi
+    @api.model
     def _notification_recipients(self, message, groups):
         groups = super(OctagonoGPS, self)._notification_recipients(message, groups)
 
@@ -459,7 +459,7 @@ class OctagonoGPS(models.Model):
         if self.warehouse_id.company_id:
             self.company_id = self.warehouse_id.company_id.id
 
-    @api.multi
+    @api.model
     def action_view_delivery(self):
         """"
         Esta función devuelve una acción que muestra las órdenes de picking existentes de
@@ -492,14 +492,14 @@ class OctagonoGPS(models.Model):
             else:
                 order.is_assign = False
 
-    @api.multi
+    @api.model
     @api.depends('picking_ids')
     def validate_picking(self):
         for picking in self.mapped('picking_ids'):
             picking.button_validate()
         self.update({'state': 'valid_product'})
 
-    @api.multi
+    @api.model
     def action_assign_custom(self):
         assigned_moves = self.env['stock.move']
         partially_available_moves = self.env['stock.move']
@@ -521,7 +521,7 @@ class OctagonoGPS(models.Model):
             self.mapped('picking_ids')._check_entire_pack()
             self.update({'state': 'assigned'})
 
-    @api.multi
+    @api.model
     def action_picking_done(self):
         if self.order_line.mapped('move_ids').filtered(
                 lambda m: m.state in ['confirmed', 'waiting', 'partially_available']):
@@ -624,7 +624,7 @@ class OctagonoGPSLine(models.Model):
             else:
                 line.product_updatable = False
 
-    @api.multi
+    @api.model
     @api.depends('product_id.invoice_policy', 'order_id.state', 'product_id')
     def _compute_qty_delivered_updateable(self):
         # captar previamente el campo antes de filtrar
@@ -652,7 +652,7 @@ class OctagonoGPSLine(models.Model):
         for line in self:
             line.price_reduce_taxexcl = line.price_subtotal / line.product_uom_qty if line.product_uom_qty else 0.0
 
-    @api.multi
+    @api.model
     def _compute_tax_id(self):
         for line in self:
             fpos = line.order_id.fiscal_position_id or line.order_id.partner_id.property_account_position_id
@@ -707,7 +707,7 @@ class OctagonoGPSLine(models.Model):
             msg += "</ul>"
             order.message_post(body=msg)
 
-    @api.multi
+    @api.model
     def write(self, values):
         if 'product_uom_qty' in values:
             precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
@@ -738,7 +738,7 @@ class OctagonoGPSLine(models.Model):
 
         return super(OctagonoGPSLine, self).write(values)
 
-    @api.multi
+    @api.model
     def _prepare_procurement_values(self, group_id=False):
         """ Prepare una clave específica para movimientos u otros componentes que se crearán a partir
         de una regla de adquisición procedente de una línea de orden de venta. Este método podría anularse
@@ -757,7 +757,7 @@ class OctagonoGPSLine(models.Model):
         }
         return values
 
-    @api.multi
+    @api.model
     def _get_display_price(self, product):
         final_price, rule_id = self.order_id.pricelist_id.get_product_price_rule(self.product_id,
                                                                                  self.product_uom_qty or 1.0,
@@ -773,7 +773,7 @@ class OctagonoGPSLine(models.Model):
         # negative discounts (= surcharge) are included in the display price
         return max(base_price, final_price)
 
-    @api.multi
+    @api.model
     @api.onchange('product_id')
     def product_id_change(self):
         if not self.product_id:
@@ -829,7 +829,7 @@ class OctagonoGPSLine(models.Model):
                                                                                       product.taxes_id, self.tax_id,
                                                                                       self.company_id)
 
-    @api.multi
+    @api.model
     def name_get(self):
         result = []
         for so_line in self:
@@ -848,7 +848,7 @@ class OctagonoGPSLine(models.Model):
             ])
         return super(OctagonoGPSLine, self).name_search(name, args, operator, limit)
 
-    @api.multi
+    @api.model
     def unlink(self):
         if self.filtered(lambda x: x.state in ('registered', 'done')):
             raise UserError(
@@ -856,7 +856,7 @@ class OctagonoGPSLine(models.Model):
                   'Descartar cambios e intentar configurar la cantidad en 0.'))
         return super(OctagonoGPSLine, self).unlink()
 
-    @api.multi
+    @api.model
     def _get_delivered_qty(self):
         self.ensure_one()
         qty = 0.0
@@ -972,7 +972,7 @@ class OctagonoGPSLine(models.Model):
             return {'warning': warning_mess}
         return {}
 
-    @api.multi
+    @api.model
     def _action_launch_stock_rule(self):
         """Inicie el método de ejecución del grupo de compras con campos requeridos / personalizados generados por un
          línea de orden de venta. El grupo de compras lanzará '_run_move', '_run_buy' o '_run_manufacture'

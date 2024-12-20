@@ -5,7 +5,7 @@ from odoo import api, fields, models
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
-    @api.multi
+    @api.model
     def _octagono_count(self):
         domain = [
             ('state', 'in', ['registered', 'done']),
