@@ -88,11 +88,11 @@ class OctagonoModelBrand(models.Model):
     _order = 'name asc'
 
     name = fields.Char('Make', required=True)
-    image = fields.Binary(
-        string="Logo",
-        attachment=True,
-        help="This field holds the image used as logo for the brand, "
-             "limited to 1024x1024px.")
+    # image = fields.Binary(
+    #     string="Logo",
+    #     attachment=True,
+    #     help="This field holds the image used as logo for the brand, "
+    #          "limited to 1024x1024px.")
     image_medium = fields.Binary(
         string="Medium-sized image",
         attachment=True,
