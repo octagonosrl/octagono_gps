@@ -23,7 +23,7 @@ class OctagonoModel(models.Model):
 
     _sql_constraints = [('name_uniq', 'unique (name)', "Nombre del modelo ya existe !")]
 
-    @api.multi
+
     @api.depends('name', 'brand_id')
     def name_get(self):
         res = []
@@ -76,7 +76,7 @@ class OctagonoModel(models.Model):
             vals['name'] = vals['name'].title()
         return super(OctagonoModel, self).create(vals)
 
-    @api.multi
+
     def write(self, vals):
         if vals.get('name'):
             vals['name'] = vals['name'].title()
@@ -122,7 +122,7 @@ class OctagonoModelBrand(models.Model):
             vals['name'] = vals['name'].title()
         return super(OctagonoModelBrand, self).create(vals)
 
-    @api.multi
+
     def write(self, vals):
         tools.image_resize_images(vals)
         if vals.get('name'):
