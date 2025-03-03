@@ -44,7 +44,7 @@ class StockMove(models.Model):
             line.qty_delivered = line._get_delivered_qty()
         return result
 
-    @api.multi
+
     def write(self, vals):
         res = super(StockMove, self).write(vals)
         if 'product_uom_qty' in vals:
