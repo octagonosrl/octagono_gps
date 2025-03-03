@@ -11,12 +11,12 @@ _logger = logging.getLogger(__name__)
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    @api.multi
+    
     def _octagono_count(self):
         for product in self:
             product.octagono_count = sum([p.octagono_count for p in product.product_variant_ids])
 
-    @api.multi
+    
     def action_view_octagono(self):
         self.ensure_one()
         action = self.env.ref('octagono_gps.action_product_octagono_list')
