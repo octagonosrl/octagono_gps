@@ -17,9 +17,9 @@ class OctagonoModel(models.Model):
                                string='Make',
                                required=True,
                                help='Make of the vehicle')
-    image = fields.Binary(related='brand_id.image', string="Logo")
-    image_medium = fields.Binary(related='brand_id.image_medium', string="Logo (medium)")
-    image_small = fields.Binary(related='brand_id.image_small', string="Logo (small)")
+    image = fields.Binary(related='brand_id.image', string="Logo", store=True)
+    image_medium = fields.Binary(related='brand_id.image_medium', string="Logo (medium)", store=True)
+    image_small = fields.Binary(related='brand_id.image_small', string="Logo (small)", store=True)
 
     _sql_constraints = [('name_uniq', 'unique (name)', "Nombre del modelo ya existe !")]
 
@@ -74,13 +74,13 @@ class OctagonoModel(models.Model):
     def create(self, vals):
         if vals.get('name'):
             vals['name'] = vals['name'].title()
-        return super(OctagonoModel, self).create(vals)
+        return super().create(vals)
 
 
     def write(self, vals):
         if vals.get('name'):
             vals['name'] = vals['name'].title()
-        return super(OctagonoModel, self).write(vals)
+        return super().write(vals)
 
 
 class OctagonoModelBrand(models.Model):
