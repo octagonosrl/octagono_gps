@@ -20,7 +20,7 @@ class OctagonoGPS(models.Model):
     _sql_constraints = [
         ('octagono_gps_vin_sn_unique', 'unique(vin_sn)', 'La numeracion del chasis ya existe.')
     ]
-    account = fields.Char(related="partner_id.Cuenta_GPS", store=True)
+    account = fields.Char(related="partner_id.cuenta_gps", store=True)
 
     @api.model
     # def get_empty_list_help(self, help):
