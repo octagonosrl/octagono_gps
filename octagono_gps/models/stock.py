@@ -64,15 +64,15 @@ class ProcurementGroup(models.Model):
     octagono_id = fields.Many2one('octagono.gps', 'Octagono GPS')
 
 
-class ProcurementRule(models.Model):
-    _inherit = 'procurement.rule'
-
-    def _get_stock_move_values(self, product_id, product_qty, product_uom, location_id, name, origin, values, group_id):
-        result = super(ProcurementRule, self)._get_stock_move_values(product_id, product_qty, product_uom, location_id,
-                                                                     name, origin, values, group_id)
-        if values.get('octagono_line_id', False):
-            result['octagono_line_id'] = values['octagono_line_id']
-        return result
+# class ProcurementRule(models.Model):
+#     _inherit = 'procurement.rule'
+#
+#     def _get_stock_move_values(self, product_id, product_qty, product_uom, location_id, name, origin, values, group_id):
+#         result = super(ProcurementRule, self)._get_stock_move_values(product_id, product_qty, product_uom, location_id,
+#                                                                      name, origin, values, group_id)
+#         if values.get('octagono_line_id', False):
+#             result['octagono_line_id'] = values['octagono_line_id']
+#         return result
 
 
 class StockPicking(models.Model):
