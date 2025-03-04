@@ -8,6 +8,10 @@ class ResPartner(models.Model):
     octagono_gps_count = fields.Integer(compute='_compute_octagono_gps_count', string='# of Vehiculos')
     octagono_gps_ids = fields.One2many('octagono.gps', 'partner_id', 'Octagono GPS')
 
+
+    Cuenta_GPS = fields.character(string='Cuenta GPS')
+
+
     def _compute_octagono_gps_count(self):
         octagono_data = self.env['octagono.gps']. \
             read_group(domain=[('partner_id', 'child_of', self.ids)], fields=['partner_id'], groupby=['partner_id'])

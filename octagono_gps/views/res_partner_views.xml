@@ -65,7 +65,7 @@
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='phone']" position="after">
-                    <field name="x_studio_field_ddQ6z"/>
+                    <field name="Cuenta_GPS"/>
                 </xpath>
             </field>
         </record>
