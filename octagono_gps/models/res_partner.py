@@ -9,7 +9,7 @@ class ResPartner(models.Model):
     octagono_gps_ids = fields.One2many('octagono.gps', 'partner_id', 'Octagono GPS')
 
 
-    Cuenta_GPS = fields.character(string='Cuenta GPS')
+    Cuenta_GPS = fields.Char(string='Cuenta GPS')
 
 
     def _compute_octagono_gps_count(self):
