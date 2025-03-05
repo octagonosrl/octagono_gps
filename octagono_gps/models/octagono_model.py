@@ -110,13 +110,14 @@ class OctagonoModelBrand(models.Model):
         if 'name' in vals and vals['name']:
             vals['name'] = vals['name'].title()
         return super().create(vals)
-
+    #
     # def write(self, vals):
     #     tools.image_resize_images(vals)
     #     if vals.get('name'):
     #         vals['name'] = vals['name'].title()
     #     return super(OctagonoModelBrand, self).write(vals)
- def write(self, vals):
+
+    def write(self, vals):
         if 'name' in vals and vals['name']:
             vals['name'] = vals['name'].title()
         return super().write(vals)
