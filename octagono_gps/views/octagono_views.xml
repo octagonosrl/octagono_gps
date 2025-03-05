@@ -17,9 +17,7 @@
                 <field name="date_order"/>
                 <field name="state"/>
                 <field name="currency_id"/>
-                <field name="image_small"/>
                 <field name="image"/>
-                <field name="image_medium"/>
                 <field name="model_id"/>
                 <field name="vin_sn"/>
                 <templates>
