@@ -18,8 +18,6 @@ class OctagonoModel(models.Model):
                                required=True,
                                help='Make of the vehicle')
     image = fields.Binary(related='brand_id.image', string="Logo", store=True)
-    image_medium = fields.Binary(related='brand_id.image_medium', string="Logo (medium)", store=True)
-    image_small = fields.Binary(related='brand_id.image_small', string="Logo (small)", store=True)
 
     _sql_constraints = [('name_uniq', 'unique (name)', "Nombre del modelo ya existe !")]
 
@@ -94,18 +92,6 @@ class OctagonoModelBrand(models.Model):
         attachment=True,
         help="This field holds the image used as logo for the brand, "
              "limited to 1024x1024px.")
-    image_medium = fields.Binary(
-        string="Medium-sized image",
-        attachment=True,
-        help="Medium-sized logo of the brand. It is automatically "
-             "resized as a 128x128px image, with aspect ratio preserved. "
-             "Use this field in form views or some kanban views.")
-    image_small = fields.Binary(
-        string="Small-sized image",
-        attachment=True,
-        help="Small-sized logo of the brand. It is automatically "
-             "resized as a 64x64px image, with aspect ratio preserved. "
-             "Use this field anywhere a small image is required.")
 
     _sql_constraints = [('name_uniq', 'unique (name)', "Nombre de la marca ya existe !")]
 

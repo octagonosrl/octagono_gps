@@ -4,7 +4,6 @@ import datetime as _date
 from datetime import datetime, timedelta, date
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
-from odoo.osv import expression
 
 # from odoo.addons import decimal_precision as dp
 from odoo.tools.float_utils import float_compare, float_round, float_is_zero
@@ -39,10 +38,11 @@ class OctagonoGPS(models.Model):
     @api.depends('fiscal_position_id')
     def _compute_tax_id(self):
         """
-        Dispare el recálculo de los impuestos si la posición fiscal se modifica en el RE.
+        Dispara el recálculo de los impuestos si la posición fiscal cambia.
         """
         for order in self:
-            order.order_line._compute_tax_id()
+            if order.order_line:  # Verifica si hay líneas en la orden
+                order.order_line._compute_tax_id()
 
     @api.model
     def _default_warehouse_id(self):
@@ -86,7 +86,7 @@ class OctagonoGPS(models.Model):
     note = fields.Text('Nota', default=_default_note, tracking=True)
     payment_term_id = fields.Many2one('account.payment.term', string='Payment Terms')
     fiscal_position_id = fields.Many2one('account.fiscal.position', string='Fiscal Position')
-    company_id = fields.Many2one('res.company', 'Empresa', default=lambda self: self.env['res.company']._company_default_get('octagono.gps'))
+    company_id = fields.Many2one('res.company', 'Empresa', default=lambda self: self.env['res.company'])
     product_id = fields.Many2one('product.product', related='order_line.product_id', string='Product', store=True)
     # product_lot_id = fields.Many2one('stock.production.lot', related='order_line.product_lot_id', string='Serial del producto', store=True)
     gps_id = fields.Many2one('product.product', compute='_get_product_lots', string='GPS', store=True)
@@ -160,14 +160,7 @@ class OctagonoGPS(models.Model):
                 raise UserError(_('You can not delete a sent quotation or a sales order! Try to cancel it before.'))
         # return super(OctagonoGPS, self).unlink()
         return super().unlink()
-    # @api.multi
-    # def _track_subtype(self, init_values):
-    #     self.ensure_one()
-    #     if 'state' in init_values and self.state == 'registered':
-    #         return 'octagono_gps.mt_register_confirmed'
-    #     elif 'state' in init_values and self.state == 'sent':
-    #         return 'octagono_gps.mt_register_sent'
-    #     return super(OctagonoGPS, self)._track_subtype(init_values)
+
 
 
     @api.onchange('partner_shipping_id', 'partner_id')
@@ -291,54 +284,6 @@ class OctagonoGPS(models.Model):
         self.mapped('picking_ids').action_cancel()
         return self.write({'state': 'cancel'})
 
-    # Observacion
-    # @api.multi
-    # def action_quotation_send(self):
-    #     """
-    #     This function opens a window to compose an email, with the edi sale template message loaded by default
-    #     """
-    #     self.ensure_one()
-    #     ir_model_data = self.env['ir.model.data']
-    #     try:
-    #         template_id = ir_model_data.get_object_reference('sale', 'email_template_edi_sale')[1]
-    #     except ValueError:
-    #         template_id = False
-    #     try:
-    #         compose_form_id = ir_model_data.get_object_reference('mail', 'email_compose_message_wizard_form')[1]
-    #     except ValueError:
-    #         compose_form_id = False
-    #     ctx = {
-    #         'default_model': 'octagono.gps',
-    #         'default_res_id': self.ids[0],
-    #         'default_use_template': bool(template_id),
-    #         'default_template_id': template_id,
-    #         'default_composition_mode': 'comment',
-    #         'mark_so_as_sent': True,
-    #         'custom_layout': "sale.mail_template_data_notification_email_sale_order",
-    #         'proforma': self.env.context.get('proforma', False),
-    #         'force_email': True
-    #     }
-    #     return {
-    #         'type': 'ir.actions.act_window',
-    #         'view_type': 'form',
-    #         'view_mode': 'form',
-    #         'res_model': 'mail.compose.message',
-    #         'views': [(compose_form_id, 'form')],
-    #         'view_id': compose_form_id,
-    #         'target': 'new',
-    #         'context': ctx,
-    #     }
-
-    # observacion
-    # @api.multi
-    # def force_quotation_send(self):
-    #     for order in self:
-    #         email_act = order.action_quotation_send()
-    #         if email_act and email_act.get('context'):
-    #             email_ctx = email_act['context']
-    #             email_ctx.update(default_email_from=order.company_id.email)
-    #             order.with_context(email_ctx).message_post_with_template(email_ctx.get('default_template_id'))
-    #     return True
 
 
     def action_done(self):
