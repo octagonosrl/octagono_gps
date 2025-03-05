@@ -13,7 +13,7 @@
         'security/ir.model.access.csv',
         # 'views/octagono_views.xml',
         # 'views/octagono_model_views.xml',
-        'views/product_views.xml',
+        # 'views/product_views.xml',
         'views/res_partner_views.xml',
         'views/stock_views.xml',
         'data/gps_cars_data.xml',
