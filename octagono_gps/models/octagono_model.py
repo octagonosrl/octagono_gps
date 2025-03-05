@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=C0111, R0903
 import logging
-
 from odoo import models, fields, api, tools  # pylint: disable=E0401
 
 _logger = logging.getLogger(__name__)
-
 
 class OctagonoModel(models.Model):
     _name = 'octagono.model'
@@ -32,12 +30,12 @@ class OctagonoModel(models.Model):
             res.append((record.id, name))
         return res
 
-    @api.onchange('brand_id')
-    def _onchange_brand(self):
-        if self.brand_id:
-            self.image_medium = self.brand_id.image
-        else:
-            self.image_medium = False
+    # @api.onchange('brand_id')
+    # def _onchange_brand(self):
+    #     if self.brand_id:
+    #         self.image_medium = self.brand_id.image
+    #     else:
+    #         self.image_medium = False
 
     @api.onchange('name')
     def change_name(self):
@@ -101,16 +99,24 @@ class OctagonoModelBrand(models.Model):
             if record.name:
                 record.name = record.name.title()
 
+    # @api.model
+    # def create(self, vals):
+    #     tools.image_resize_images(vals)
+    #     if vals.get('name'):
+    #         vals['name'] = vals['name'].title()
+    #     return super(OctagonoModelBrand, self).create(vals)
     @api.model
     def create(self, vals):
-        tools.image_resize_images(vals)
-        if vals.get('name'):
+        if 'name' in vals and vals['name']:
             vals['name'] = vals['name'].title()
-        return super(OctagonoModelBrand, self).create(vals)
+        return super().create(vals)
 
-
-    def write(self, vals):
-        tools.image_resize_images(vals)
-        if vals.get('name'):
+    # def write(self, vals):
+    #     tools.image_resize_images(vals)
+    #     if vals.get('name'):
+    #         vals['name'] = vals['name'].title()
+    #     return super(OctagonoModelBrand, self).write(vals)
+ def write(self, vals):
+        if 'name' in vals and vals['name']:
             vals['name'] = vals['name'].title()
-        return super(OctagonoModelBrand, self).write(vals)
+        return super().write(vals)

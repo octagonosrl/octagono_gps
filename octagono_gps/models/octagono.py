@@ -48,7 +48,8 @@ class OctagonoGPS(models.Model):
     def _default_warehouse_id(self):
         company = self.env.user.company_id.id
         warehouse_ids = self.env['stock.warehouse'].search([('company_id', '=', company)], limit=1)
-        return warehouse_ids
+        # return warehouse_ids
+        return warehouse_ids.id if warehouse_ids else False
 
     name = fields.Char(string='Referencia', compute='_compute_name', store=True)
     origin = fields.Char(string='Documento fuente', help="Referencia del documento que generó esta solicitud "
@@ -144,7 +145,8 @@ class OctagonoGPS(models.Model):
     def _compute_is_expired(self):
         now = datetime.now()
         for order in self:
-            if order.validity_date and fields.Datetime.from_string(order.validity_date) < now:
+            # if order.validity_date and fields.Datetime.from_string(order.validity_date) < now:
+            if order.validity_date and order.validity_date < now:
                 order.is_expired = True
             else:
                 order.is_expired = False
@@ -165,9 +167,13 @@ class OctagonoGPS(models.Model):
 
     @api.onchange('partner_shipping_id', 'partner_id')
     def onchange_partner_shipping_id(self):
-        self.fiscal_position_id = self.env['account.fiscal.position'].get_fiscal_position(self.partner_id.id,
-                                                                                          self.partner_shipping_id.id)
+        # self.fiscal_position_id = self.env['account.fiscal.position'].get_fiscal_position(self.partner_id.id,
+        #                                                                                   self.partner_shipping_id.id)
+        self.fiscal_position_id = self.env['account.fiscal.position'].with_context(
+            force_company=self.company_id.id
+        ).get_fiscal_position(self.partner_id)
         return {}
+
 
 
     @api.onchange('partner_id')
@@ -269,7 +275,9 @@ class OctagonoGPS(models.Model):
         if 'order_line' not in default:
             default['order_line'] = [(0, 0, line.copy_data()[0]) for line in
                                      self.order_line.filtered(lambda l: not l.is_downpayment)]
-        default['vin_sn'] = (self.vin_sn.split('-', 1))[0]
+        # default['vin_sn'] = (self.vin_sn.split('-', 1))[0]
+        default['vin_sn'] = (self.vin_sn.split('-', 1)[0]) if self.vin_sn else ''
+
         return super(OctagonoGPS, self).copy_data(default)
 
 
@@ -504,7 +512,7 @@ class OctagonoGPSLine(models.Model):
     _order = 'sequence, id'
 
     order_id = fields.Many2one('octagono.gps', string='Referencia', required=True, ondelete='cascade', index=True, copy=False)
-    name = fields.Text(string='Descriccion', required=True)
+    name = fields.Text(string='Descripcion', required=True)
     sequence = fields.Integer(string='Sequence', default=10)
     price_unit = fields.Float('Unit Price', required=True, digits='Product Price', default=0.0)
     price_subtotal = fields.Monetary(compute='_compute_amount', string='Subtotal', readonly=True, store=True)
@@ -555,15 +563,24 @@ class OctagonoGPSLine(models.Model):
         """
         for line in self:
             price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-            taxes = line.tax_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty,
-                                            product=line.product_id, partner=line.order_id.partner_shipping_id)
-            line.update({
-                'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
-                'price_total': taxes['total_included'],
-                'price_subtotal': taxes['total_excluded'],
-            })
+            if line.order_id.currency_id:  # Verifica que currency_id esté definido
+                taxes = line.tax_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty,
+                                                product=line.product_id, partner=line.order_id.partner_shipping_id)
+                line.update({
+                    'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
+                    'price_total': taxes['total_included'],
+                    'price_subtotal': taxes['total_excluded'],
+                })
+            # taxes = line.tax_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty,
+            #                                 product=line.product_id, partner=line.order_id.partner_shipping_id)
+            # line.update({
+            #     'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
+            #     'price_total': taxes['total_included'],
+            #     'price_subtotal': taxes['total_excluded'],
+            # })
 
-    @api.depends('product_id', 'order_id.state', 'qty_delivered')
+    # @api.depends('product_id', 'order_id.state', 'qty_delivered')
+    @api.depends('product_id', 'qty_delivered')
     def _compute_product_updatable(self):
         for line in self:
             if not line.move_ids.filtered(lambda m: m.state != 'cancel'):
@@ -596,20 +613,36 @@ class OctagonoGPSLine(models.Model):
     @api.depends('price_total', 'product_uom_qty')
     def _get_price_reduce_tax(self):
         for line in self:
-            line.price_reduce_taxinc = line.price_total / line.product_uom_qty if line.product_uom_qty else 0.0
+            line.price_reduce_taxinc = (
+                float_round(line.price_total / line.product_uom_qty, precision_rounding=line.product_uom_qty.rounding)
+                if line.product_uom_qty else 0.0
+            )
 
     @api.depends('price_subtotal', 'product_uom_qty')
     def _get_price_reduce_notax(self):
         for line in self:
-            line.price_reduce_taxexcl = line.price_subtotal / line.product_uom_qty if line.product_uom_qty else 0.0
+            line.price_reduce_taxexcl = (
+                float_round(line.price_subtotal / line.product_uom_qty,
+                            precision_rounding=line.product_uom_qty.rounding)
+                if line.product_uom_qty else 0.0
+            )
 
+    # def _compute_tax_id(self):
+    #     for line in self:
+    #         fpos = line.order_id.fiscal_position_id or line.order_id.partner_id.property_account_position_id
+    #         # Si se establece company_id, siempre filtre impuestos por la compañía
+    #         taxes = line.product_id.taxes_id.filtered(lambda r: not line.company_id or r.company_id == line.company_id)
+    #         line.tax_id = fpos.map_tax(taxes, line.product_id, line.order_id.partner_shipping_id) if fpos else taxes
 
+    @api.depends('product_id', 'order_id.state', 'qty_delivered')
     def _compute_tax_id(self):
         for line in self:
             fpos = line.order_id.fiscal_position_id or line.order_id.partner_id.property_account_position_id
-            # Si se establece company_id, siempre filtre impuestos por la compañía
             taxes = line.product_id.taxes_id.filtered(lambda r: not line.company_id or r.company_id == line.company_id)
-            line.tax_id = fpos.map_tax(taxes, line.product_id, line.order_id.partner_shipping_id) if fpos else taxes
+            if fpos:  # Verifica si fpos está definido
+                line.tax_id = fpos.map_tax(taxes, line.product_id, line.order_id.partner_shipping_id) if fpos else taxes
+            else:
+                line.tax_id = taxes
 
     @api.model
     def _prepare_add_missing_fields(self, values):
@@ -636,7 +669,7 @@ class OctagonoGPSLine(models.Model):
         return line
 
     def _update_line_quantity(self, values):
-        if self.mapped('qty_delivered') and values['product_uom_qty'] < max(self.mapped('qty_delivered')):
+        if self.mapped('qty_delivered') and  values.get('product_uom_qty', 0.0) < max(self.mapped('qty_delivered')):
             raise UserError('No puede disminuir la cantidad pedida por debajo de la cantidad entregada.\n'
                             'Crea una devolución primero.')
         for line in self:
