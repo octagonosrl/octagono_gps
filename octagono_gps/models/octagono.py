@@ -529,7 +529,7 @@ class OctagonoGPSLine(models.Model):
     product_uom_qty = fields.Float(string='Quantity', digits='Product Unit of Measure', required=True, default=1.0)
     product_uom = fields.Many2one('product.uom', string='Unit of Measure', required=True)
     # Non-stored related field to allow portal user to see the image of the product he has ordered
-    product_image = fields.Binary('Product Image', related="product_id.image", store=True)
+    # product_image = fields.Binary('Product Image', related="product_id.image", store=True)
     qty_delivered_updateable = fields.Boolean(compute='_compute_qty_delivered_updateable', string='Can Edit Delivered', readonly=True, default=True)
     qty_delivered = fields.Float(string='Delivered', copy=False, digits='Product Unit of Measure', default=0.0)
     salesman_id = fields.Many2one(related='order_id.user_id', store=True, string='Usuario', readonly=True)
