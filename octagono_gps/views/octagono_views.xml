@@ -390,7 +390,8 @@
     </record>
 
     <!--Octagono GPS Line Search View-->
-    <record id="view_octagono_gps_line_filter" model="ir.ui.view">
+    <!-- Octagono GPS Line Search View -->
+    <record id="octagono_gps.octagono_gps_line_select" model="ir.ui.view">
         <field name="name">octagono.gps.line.select</field>
         <field name="model">octagono.gps.line</field>
         <field name="arch" type="xml">
@@ -409,6 +410,26 @@
             </search>
         </field>
     </record>
+
+<!--    <record id="view_octagono_gps_line_filter" model="ir.ui.view">-->
+<!--        <field name="name">octagono.gps.line.select</field>-->
+<!--        <field name="model">octagono.gps.line</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <search string="Search Octagono GPS Line">-->
+<!--                <filter string="My Octagono Order Lines" domain="[('salesman_id','=',uid)]"-->
+<!--                        help="Octagono Order Lines related to a Sales Order of mine"/>-->
+<!--                <field name="order_id"/>-->
+<!--                <field name="order_partner_id" operator="child_of"/>-->
+<!--                <field name="product_id"/>-->
+<!--                <field name="salesman_id"/>-->
+<!--                <group expand="0" string="Group By">-->
+<!--                    <filter string="Product" domain="[]" context="{'group_by':'product_id'}"/>-->
+<!--                    <filter string="Order" domain="[]" context="{'group_by':'order_id'}"/>-->
+<!--                    <filter string="Usuario" domain="[]" context="{'group_by':'salesman_id'}"/>-->
+<!--                </group>-->
+<!--            </search>-->
+<!--        </field>-->
+<!--    </record>-->
 
     <!--Octagono GPS Line Action Window-->
     <record id="action_product_octagono_list" model="ir.actions.act_window">
