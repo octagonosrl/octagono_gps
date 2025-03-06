@@ -476,9 +476,7 @@
         <field name="model">octagono.gps.colors</field>
         <field name="arch" type="xml">
             <tree string="Colors">
-                <group>
                     <field name="name"/>
-                </group>
             </tree>
         </field>
     </record>
