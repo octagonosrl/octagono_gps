@@ -128,7 +128,7 @@
       	<field name="name">Lancia</field>
       	<field name="image" type="base64" file="octagono_gps/static/img/brand_lancia-image.png"/>
       </record>
-      <record id="brand_land rover" model="octagono.model.brand">
+      <record id="brand_land_rover" model="octagono.model.brand">
       	<field name="name">Land Rover</field>
       	<field name="image" type="base64" file="octagono_gps/static/img/brand_land-rover-image.png"/>
       </record>
@@ -208,7 +208,7 @@
       	<field name="name">Renault</field>
       	<field name="image" type="base64" file="octagono_gps/static/img/brand_renault-image.png"/>
       </record>
-      <record id="brand_rolls-royce" model="octagono.model.brand">
+      <record id="brand_rolls_royce" model="octagono.model.brand">
       	<field name="name">Rolls-Royce</field>
       	<field name="image" type="base64" file="octagono_gps/static/img/brand_rolls-royce-image.png"/>
       </record>
@@ -236,7 +236,7 @@
       	<field name="name">Subaru</field>
       	<field name="image" type="base64" file="octagono_gps/static/img/brand_subaru-image.png"/>
       </record>
-      <record id="brand_tesla motors" model="octagono.model.brand">
+      <record id="brand_tesla_motors" model="octagono.model.brand">
       	<field name="name">Tesla Motors</field>
       	<field name="image" type="base64" file="octagono_gps/static/img/brand_tesla-motors-image.png"/>
       </record>
