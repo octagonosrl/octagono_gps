@@ -243,25 +243,25 @@ class OctagonoGPS(models.Model):
                 raise ValidationError('Producto "%s" no es valido. \n'
                                       'Asegurese de seleccionar solo'
                                       ' un sim card y un gps.' % product_obj.name)
-
-    @api.model
-    def create(self, vals):
-        if vals.get('order_line'):
-            product_ids = [p[2]['product_id'] for p in vals['order_line']]
-            self.validate_product(product_ids)
-
-        if vals.get('name', _('New')) == _('New'):
-            vals['name'] = self._compute_name()
-
-        # Se asegura de que se definan partner_invoice_id ',' partner_shipping_id 'y' pricelist_id '
-        if any(f not in vals for f in ['partner_invoice_id', 'partner_shipping_id', 'pricelist_id']):
-            partner = self.env['res.partner'].browse(vals.get('partner_id'))
-            addr = partner.address_get(['delivery', 'invoice'])
-            vals['partner_invoice_id'] = vals.setdefault('partner_invoice_id', addr['invoice'])
-            vals['partner_shipping_id'] = vals.setdefault('partner_shipping_id', addr['delivery'])
-            vals['pricelist_id'] = vals.setdefault('pricelist_id', partner.property_product_pricelist and partner.property_product_pricelist.id)
-
-        return super(OctagonoGPS, self).create(vals)
+    #
+    # @api.model
+    # def create(self, vals):
+    #     if vals.get('order_line'):
+    #         product_ids = [p[2]['product_id'] for p in vals['order_line']]
+    #         self.validate_product(product_ids)
+    #
+    #     if vals.get('name', _('New')) == _('New'):
+    #         vals['name'] = self._compute_name()
+    #
+    #     # Se asegura de que se definan partner_invoice_id ',' partner_shipping_id 'y' pricelist_id '
+    #     if any(f not in vals for f in ['partner_invoice_id', 'partner_shipping_id', 'pricelist_id']):
+    #         partner = self.env['res.partner'].browse(vals.get('partner_id'))
+    #         addr = partner.address_get(['delivery', 'invoice'])
+    #         vals['partner_invoice_id'] = vals.setdefault('partner_invoice_id', addr['invoice'])
+    #         vals['partner_shipping_id'] = vals.setdefault('partner_shipping_id', addr['delivery'])
+    #         vals['pricelist_id'] = vals.setdefault('pricelist_id', partner.property_product_pricelist and partner.property_product_pricelist.id)
+    #
+    #     return super(OctagonoGPS, self).create(vals)
 
     # return super(OctagonoGPS, self).create(vals)
 
