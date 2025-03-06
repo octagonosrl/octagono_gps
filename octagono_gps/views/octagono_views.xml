@@ -391,7 +391,7 @@
 
     <!--Octagono GPS Line Search View-->
     <!-- Octagono GPS Line Search View -->
-    <record id="octagono_gps.octagono_gps_line_select" model="ir.ui.view">
+    <record id="view_octagono_gps_line_select" model="ir.ui.view">
         <field name="name">octagono.gps.line.select</field>
         <field name="model">octagono.gps.line</field>
         <field name="arch" type="xml">
@@ -439,7 +439,7 @@
         <field name="view_mode">tree</field>
         <field name="context">{'search_default_product_id': [active_id], 'default_product_id': active_id}</field>
         <field name="domain">[('state', 'in', ['registered', 'done'])]</field>
-        <field name="search_view_id" ref="view_octagono_gps_line_filter"/>
+        <field name="search_view_id" ref="view_octagono_gps_line_select"/>
     </record>
 
     <!--================= MAIL ============-->
