@@ -350,24 +350,24 @@
 <!--        </field>-->
 <!--    </record>-->
 
-    <!--Octagono GPS Action Window-->
-<!--    <record id="action_octagono_gps" model="ir.actions.act_window">-->
-<!--        <field name="name">Vehiculos</field>-->
-<!--        <field name="type">ir.actions.act_window</field>-->
-<!--        <field name="res_model">octagono.gps</field>-->
-<!--        <field name="view_mode">form</field>-->
-<!--        <field name="view_mode">tree,kanban,form</field>-->
-<!--        <field name="search_view_id" ref="view_octagono_gps_filter"/>-->
-<!--        <field name="context">{"search_default_propetario": True, "search_default_done": True}</field>-->
-<!--        <field name="help" type="html">-->
-<!--            <p class="oe_view_nocontent_create">-->
-<!--                Crea un nuevo registro, el primer paso para registrar un vehiculo.-->
-<!--            </p>-->
-<!--        </field>-->
-<!--    </record>-->
+    Octagono GPS Action Window
+    <record id="action_octagono_gps" model="ir.actions.act_window">
+        <field name="name">Vehiculos</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">octagono.gps</field>
+        <field name="view_mode">form</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="search_view_id" ref="view_octagono_gps_filter"/>
+        <field name="context">{"search_default_propetario": True, "search_default_done": True}</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Crea un nuevo registro, el primer paso para registrar un vehiculo.
+            </p>
+        </field>
+    </record>
 
     <!--Menu Top Vehiculos-->
-<!--    <menuitem id="menu_octagono_gps" action="action_octagono_gps" parent="octagono_gps_menu_root" groups="octagono_gps.group_octagono_gps_user" sequence="1"/>-->
+    <menuitem id="menu_octagono_gps" action="action_octagono_gps" parent="octagono_gps_menu_root" groups="octagono_gps.group_octagono_gps_user" sequence="1"/>
 
     <!--Octagono GPS Line Tree View-->
     <record id="view_octagono_gps_line_tree" model="ir.ui.view">
