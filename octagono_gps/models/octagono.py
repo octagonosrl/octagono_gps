@@ -821,14 +821,14 @@ class OctagonoGPSLine(models.Model):
             result.append((so_line.id, name))
         return result
 
-    @api.model
-    def name_search(self, name='', args=None, operator='ilike', limit=100):
-        if operator in ('ilike', 'like', '=', '=like', '=ilike'):
-            args = expression.AND([
-                args or [],
-                ['|', ('order_id.name', operator, name), ('name', operator, name)]
-            ])
-        return super().name_search(name, args, operator, limit)
+    # @api.model
+    # def name_search(self, name='', args=None, operator='ilike', limit=100):
+    #     if operator in ('ilike', 'like', '=', '=like', '=ilike'):
+    #         args = expression.AND([
+    #             args or [],
+    #             ['|', ('order_id.name', operator, name), ('name', operator, name)]
+    #         ])
+    #     return super().name_search(name, args, operator, limit)
 
 
     def unlink(self):
