@@ -367,7 +367,7 @@
 <!--    </record>-->
 
     <!--Menu Top Vehiculos-->
-    <menuitem id="menu_octagono_gps" action="action_octagono_gps" parent="octagono_gps_menu_root" groups="octagono_gps.group_octagono_gps_user" sequence="1"/>
+<!--    <menuitem id="menu_octagono_gps" action="action_octagono_gps" parent="octagono_gps_menu_root" groups="octagono_gps.group_octagono_gps_user" sequence="1"/>-->
 
     <!--Octagono GPS Line Tree View-->
     <record id="view_octagono_gps_line_tree" model="ir.ui.view">
