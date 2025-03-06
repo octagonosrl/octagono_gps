@@ -64,34 +64,34 @@ class OctagonoGPS(models.Model):
         ('cancel', 'Cancelado'),
     ], string='Status', readonly=True, copy=False, index=True, tracking=True, default='draft')
     date_order = fields.Datetime(string='Order Date', required=True, readonly=True, index=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, copy=False, default=fields.Datetime.now)
-    # validity_date = fields.Date(string='Expiration Date', readonly=True, copy=False, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
-    #                             help="Manually set the expiration date of your quotation (offer), or it will set the "
-    #                                  "date automatically based on the template if online quotation is installed.")
-    # is_expired = fields.Boolean(compute='_compute_is_expired', string="Is expired")
-    # create_date = fields.Datetime(string='Creation Date', readonly=True, index=True, help="Date on which sales order is created.")
-    # confirmation_date = fields.Datetime(string='Fecha de confirmación', readonly=True, index=True, copy=False,
-    #                                     help=u"Fecha de confirmación.")
-    # billing_date = fields.Datetime(string='Fecha de facturación', index=True)
-    # next_billing_date = fields.Datetime(string='Próxima fecha de factura', index=True)
+    validity_date = fields.Date(string='Expiration Date', readonly=True, copy=False, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
+                                help="Manually set the expiration date of your quotation (offer), or it will set the "
+                                     "date automatically based on the template if online quotation is installed.")
+    is_expired = fields.Boolean(compute='_compute_is_expired', string="Is expired")
+    create_date = fields.Datetime(string='Creation Date', readonly=True, index=True, help="Date on which sales order is created.")
+    confirmation_date = fields.Datetime(string='Fecha de confirmación', readonly=True, index=True, copy=False,
+                                        help=u"Fecha de confirmación.")
+    billing_date = fields.Datetime(string='Fecha de facturación', index=True)
+    next_billing_date = fields.Datetime(string='Próxima fecha de factura', index=True)
     user_id = fields.Many2one('res.users', string='Usuario', index=True, tracking=True,
                               default=lambda self: self.env.user)
     partner_id = fields.Many2one('res.partner', string='Propetario', required=True, change_default=True, index=True, tracking=True)
-    # partner_name = fields.Char(related='partner_id.name')
-    # partner_invoice_id = fields.Many2one('res.partner', string='Invoice Address', readonly=True, required=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Invoice address for current sales order.")
-    # partner_shipping_id = fields.Many2one('res.partner', string='Dirección de entrega', readonly=True, required=True,  states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Delivery address for current sales order.")
+    partner_name = fields.Char(related='partner_id.name')
+    partner_invoice_id = fields.Many2one('res.partner', string='Invoice Address', readonly=True, required=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Invoice address for current sales order.")
+    partner_shipping_id = fields.Many2one('res.partner', string='Dirección de entrega', readonly=True, required=True,  states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Delivery address for current sales order.")
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist', required=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Pricelist for current sales order.")
     currency_id = fields.Many2one("res.currency", related='pricelist_id.currency_id', string="Currency", readonly=True, required=True, store=True)
-    # order_line = fields.One2many('octagono.gps.line', 'order_id', string='Order Lines', states={'cancel': [('readonly', True)], 'done': [('readonly', True)]}, copy=True, auto_join=True)
-    # note = fields.Text('Nota', default=_default_note, tracking=True)
-    # payment_term_id = fields.Many2one('account.payment.term', string='Payment Terms')
-    # fiscal_position_id = fields.Many2one('account.fiscal.position', string='Fiscal Position')
+    order_line = fields.One2many('octagono.gps.line', 'order_id', string='Order Lines', states={'cancel': [('readonly', True)], 'done': [('readonly', True)]}, copy=True, auto_join=True)
+    note = fields.Text('Nota', default=_default_note, tracking=True)
+    payment_term_id = fields.Many2one('account.payment.term', string='Payment Terms')
+    fiscal_position_id = fields.Many2one('account.fiscal.position', string='Fiscal Position')
     company_id = fields.Many2one('res.company', 'Empresa', default=lambda self: self.env.company)
-    # product_id = fields.Many2one('product.product', related='order_line.product_id', string='Product', store=True)
-    # # product_lot_id = fields.Many2one('stock.production.lot', related='order_line.product_lot_id', string='Serial del producto', store=True)
-    # gps_id = fields.Many2one('product.product', compute='_get_product_lots', string='GPS', store=True)
-    # gps_lot_id = fields.Many2one('stock.production.lot', compute='_get_product_lots', string='Serial GPS', store=True)
-    # sim_id = fields.Many2one('product.product', compute='_get_product_lots', string='SIM', store=True)
-    # sim_lot_id = fields.Many2one('stock.production.lot', compute='_get_product_lots', string='Serial SIM', store=True)
+    product_id = fields.Many2one('product.product', related='order_line.product_id', string='Product', store=True)
+    product_lot_id = fields.Many2one('stock.production.lot', related='order_line.product_lot_id', string='Serial del producto', store=True)
+    gps_id = fields.Many2one('product.product', compute='_get_product_lots', string='GPS', store=True)
+    gps_lot_id = fields.Many2one('stock.production.lot', compute='_get_product_lots', string='Serial GPS', store=True)
+    sim_id = fields.Many2one('product.product', compute='_get_product_lots', string='SIM', store=True)
+    sim_lot_id = fields.Many2one('stock.production.lot', compute='_get_product_lots', string='Serial SIM', store=True)
 
     @api.depends('order_line', 'order_line.product_id', 'order_line.product_lot_id')
     def _get_product_lots(self):
