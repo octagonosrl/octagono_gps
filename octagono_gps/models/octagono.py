@@ -81,7 +81,7 @@ class OctagonoGPS(models.Model):
     partner_shipping_id = fields.Many2one('res.partner', string='Dirección de entrega', readonly=True, required=True,  states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Delivery address for current sales order.")
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist', required=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Pricelist for current sales order.")
     currency_id = fields.Many2one("res.currency", related='pricelist_id.currency_id', string="Currency", readonly=True, required=True, store=True)
-    order_line = fields.One2many('octagono.gps.line', 'order_id', string='Order Lines', states={'cancel': [('readonly', True)], 'done': [('readonly', True)]}, copy=True, auto_join=True)
+    # order_line = fields.One2many('octagono.gps.line', 'order_id', string='Order Lines', states={'cancel': [('readonly', True)], 'done': [('readonly', True)]}, copy=True, auto_join=True)
     note = fields.Text('Nota', default=_default_note, tracking=True)
     payment_term_id = fields.Many2one('account.payment.term', string='Payment Terms')
     fiscal_position_id = fields.Many2one('account.fiscal.position', string='Fiscal Position')
@@ -821,14 +821,14 @@ class OctagonoGPSLine(models.Model):
             result.append((so_line.id, name))
         return result
 
-    # @api.model
-    # def name_search(self, name='', args=None, operator='ilike', limit=100):
-    #     if operator in ('ilike', 'like', '=', '=like', '=ilike'):
-    #         args = expression.AND([
-    #             args or [],
-    #             ['|', ('order_id.name', operator, name), ('name', operator, name)]
-    #         ])
-    #     return super().name_search(name, args, operator, limit)
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        if operator in ('ilike', 'like', '=', '=like', '=ilike'):
+            args = expression.AND([
+                args or [],
+                ['|', ('order_id.name', operator, name), ('name', operator, name)]
+            ])
+        return super().name_search(name, args, operator, limit)
 
 
     def unlink(self):
