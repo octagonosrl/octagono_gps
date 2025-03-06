@@ -475,11 +475,11 @@
         <field name="name">octagono.gps.colors.tree</field>
         <field name="model">octagono.gps.colors</field>
         <field name="arch" type="xml">
-            <form string="Colors">
+            <tree string="Colors">
                 <group>
                     <field name="name"/>
                 </group>
-            </form>
+            </tree>
         </field>
     </record>
 
@@ -500,7 +500,7 @@
     <record id="action_octagono_gps_colors" model="ir.actions.act_window">
         <field name="name">Listado de Colores</field>
         <field name="res_model">octagono.gps.colors</field>
-        <field name="view_mode">tree, form</field>
+        <field name="view_mode">tree,form</field>
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">
                 Click para agregar un nuevo color.
