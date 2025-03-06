@@ -56,7 +56,7 @@
       	<field name="name">Citroen</field>
       	<field name="image" type="base64" file="octagono_gps/static/img/brand_citroen-image.png"/>
       </record>
-      <record id="brand_corre la licorne" model="octagono.model.brand">
+      <record id="brand_corre_la_licorne" model="octagono.model.brand">
       	<field name="name">Corre La Licorne</field>
       	<field name="image" type="base64" file="octagono_gps/static/img/brand_corre-la-licorne-image.png"/>
       </record>
