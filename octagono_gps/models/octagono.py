@@ -243,7 +243,7 @@ class OctagonoGPS(models.Model):
                 raise ValidationError('Producto "%s" no es valido. \n'
                                       'Asegurese de seleccionar solo'
                                       ' un sim card y un gps.' % product_obj.name)
-    #
+
     # @api.model
     # def create(self, vals):
     #     if vals.get('order_line'):
@@ -263,7 +263,6 @@ class OctagonoGPS(models.Model):
     #
     #     return super(OctagonoGPS, self).create(vals)
 
-    # return super(OctagonoGPS, self).create(vals)
 
     def copy_data(self, default=None):
         if default is None:
