@@ -471,7 +471,7 @@
     <menuitem id="menu_octagono_gps_tags" action="action_octagono_gps_tags" parent="menu_octagono_config" sequence="2"/>
 
     <!-- Octagono GPS Tag tree view -->
-    <record id="view_octagono_gps_colors_form" model="ir.ui.view">
+    <record id="view_octagono_gps_colors_tree" model="ir.ui.view">
         <field name="name">octagono.gps.colors.tree</field>
         <field name="model">octagono.gps.colors</field>
         <field name="arch" type="xml">
@@ -483,6 +483,19 @@
         </field>
     </record>
 
+    <record id="view_octagono_gps_colors_form" model="ir.ui.view">
+        <field name="name">octagono.gps.colors.form</field>
+        <field name="model">octagono.gps.colors</field>
+        <field name="arch" type="xml">
+            <form string="Color GPS">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
     <!-- Octagono GPS Tag action view -->
     <record id="action_octagono_gps_colors" model="ir.actions.act_window">
         <field name="name">Listado de Colores</field>
