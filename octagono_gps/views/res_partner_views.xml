@@ -49,13 +49,12 @@
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="priority" eval="20"/>
             <field name="arch" type="xml">
-                <button name="toggle_active" position="before">
+                <xpath expr="//form//header" position="inside">
                     <button class="oe_stat_button" type="action" name="%(octagono_gps.act_res_partner_2_octagono_gps)d"
-                            attrs="{'invisible': [('customer', '=', False)]}"
-                            icon="fas fa-car">
+                            attrs="{'invisible': [('customer', '=', False)]}" icon="fas fa-car">
                         <field string="Vehiculos" name="octagono_gps_count" widget="statinfo"/>
                     </button>
-                </button>
+                </xpath>
             </field>
         </record>
 
