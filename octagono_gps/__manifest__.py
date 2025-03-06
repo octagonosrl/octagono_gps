@@ -11,8 +11,8 @@
     'data': [
         'security/octagono_gps_groups.xml',
         'security/ir.model.access.csv',
-        # 'views/octagono_views.xml',
-        # 'views/octagono_model_views.xml',
+        'views/octagono_views.xml',
+        'views/octagono_model_views.xml',
         # 'views/product_views.xml',
         # 'views/res_partner_views.xml',
         # 'views/stock_views.xml',
