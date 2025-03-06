@@ -38,11 +38,11 @@ class StockMove(models.Model):
         vals['octagono_line_id'] = self.octagono_line_id.id
         return vals
 
-    def _action_done(self):
-        result = super(StockMove, self)._action_done()
-        for line in result.mapped('octagono_line_id').sudo():
-            line.qty_delivered = line._get_delivered_qty()
-        return result
+    # def _action_done(self):
+    #     result = super(StockMove, self)._action_done()
+    #     for line in result.mapped('octagono_line_id').sudo():
+    #         line.qty_delivered = line._get_delivered_qty()
+    #     return result
 
 
     def write(self, vals):
