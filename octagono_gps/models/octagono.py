@@ -37,19 +37,17 @@ class OctagonoGPS(models.Model):
 
     @api.depends('fiscal_position_id')
     def _compute_tax_id(self):
-        """
-        Dispara el recálculo de los impuestos si la posición fiscal cambia.
-        """
         for order in self:
-            if order.order_line:  # Verifica si hay líneas en la orden
+            if order.order_line.filtered(lambda l: l.tax_id):
                 order.order_line._compute_tax_id()
 
     @api.model
     def _default_warehouse_id(self):
-        company = self.env.user.company_id.id
-        warehouse_ids = self.env['stock.warehouse'].search([('company_id', '=', company)], limit=1)
-        # return warehouse_ids
-        return warehouse_ids.id if warehouse_ids else False
+        company = self.env.user.company_id
+        if company:
+            warehouse = self.env['stock.warehouse'].search([('company_id', '=', company.id)], limit=1)
+            return warehouse.id if warehouse else False
+        return False
 
     name = fields.Char(string='Referencia', compute='_compute_name', store=True)
     origin = fields.Char(string='Documento fuente', help="Referencia del documento que generó esta solicitud "
@@ -87,7 +85,7 @@ class OctagonoGPS(models.Model):
     note = fields.Text('Nota', default=_default_note, tracking=True)
     payment_term_id = fields.Many2one('account.payment.term', string='Payment Terms')
     fiscal_position_id = fields.Many2one('account.fiscal.position', string='Fiscal Position')
-    company_id = fields.Many2one('res.company', 'Empresa', default=lambda self: self.env['res.company'])
+    company_id = fields.Many2one('res.company', 'Empresa', default=lambda self: self.env.company)
     product_id = fields.Many2one('product.product', related='order_line.product_id', string='Product', store=True)
     # product_lot_id = fields.Many2one('stock.production.lot', related='order_line.product_lot_id', string='Serial del producto', store=True)
     gps_id = fields.Many2one('product.product', compute='_get_product_lots', string='GPS', store=True)
@@ -97,16 +95,14 @@ class OctagonoGPS(models.Model):
 
     @api.depends('order_line', 'order_line.product_id', 'order_line.product_lot_id')
     def _get_product_lots(self):
-        for rec in self.filtered('order_line'):
-            gps_line = rec.order_line.filtered(lambda line: 'GPS' in line.product_id.name) or False
-            sim_line = rec.order_line.filtered(lambda line: 'SIM' in line.product_id.name) or False
+        for rec in self:
+            gps_line = rec.order_line.filtered(lambda line: 'GPS' in line.product_id.name)
+            sim_line = rec.order_line.filtered(lambda line: 'SIM' in line.product_id.name)
 
-            if gps_line:
-                rec.gps_id = gps_line.product_id.id
-                rec.gps_lot_id = gps_line.product_lot_id.id
-            if sim_line:
-                rec.sim_id = sim_line.product_id.id
-                rec.sim_lot_id = sim_line.product_lot_id.id
+            rec.gps_id = gps_line[0].product_id.id if gps_line else False
+            rec.gps_lot_id = gps_line[0].product_lot_id.id if gps_line else False
+            rec.sim_id = sim_line[0].product_id.id if sim_line else False
+            rec.sim_lot_id = sim_line[0].product_lot_id.id if sim_line else False
 
     # Campo relacionados a vehiculos
     active = fields.Boolean(default=True, tracking=True)
