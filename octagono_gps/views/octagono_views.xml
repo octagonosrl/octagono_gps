@@ -350,7 +350,7 @@
         </field>
     </record>
 
-    Octagono GPS Action Window
+<!--    Octagono GPS Action Window-->
     <record id="action_octagono_gps" model="ir.actions.act_window">
         <field name="name">Vehiculos</field>
         <field name="type">ir.actions.act_window</field>
@@ -460,7 +460,7 @@
     <record id="action_octagono_gps_tags" model="ir.actions.act_window">
         <field name="name">Etiquetas P. Instalacion</field>
         <field name="res_model">octagono.gps.tags</field>
-        <field name="view_mode">form</field>
+        <field name="view_mode">tree,form</field>
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">
                 Click para agregar una nueva etiqueta.
