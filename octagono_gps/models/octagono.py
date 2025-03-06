@@ -85,7 +85,7 @@ class OctagonoGPS(models.Model):
     # note = fields.Text('Nota', default=_default_note, tracking=True)
     # payment_term_id = fields.Many2one('account.payment.term', string='Payment Terms')
     # fiscal_position_id = fields.Many2one('account.fiscal.position', string='Fiscal Position')
-    # company_id = fields.Many2one('res.company', 'Empresa', default=lambda self: self.env.company)
+    company_id = fields.Many2one('res.company', 'Empresa', default=lambda self: self.env.company)
     # product_id = fields.Many2one('product.product', related='order_line.product_id', string='Product', store=True)
     # # product_lot_id = fields.Many2one('stock.production.lot', related='order_line.product_lot_id', string='Serial del producto', store=True)
     # gps_id = fields.Many2one('product.product', compute='_get_product_lots', string='GPS', store=True)
