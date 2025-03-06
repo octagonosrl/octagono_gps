@@ -402,11 +402,11 @@
                 <field name="order_partner_id" operator="child_of"/>
                 <field name="product_id"/>
                 <field name="salesman_id"/>
-                <group string="Group By">
-                    <filter string="Product" domain="[]" context="{'group_by':'product_id'}"/>
-                    <filter string="Order" domain="[]" context="{'group_by':'order_id'}"/>
-                    <filter string="Usuario" domain="[]" context="{'group_by':'salesman_id'}"/>
-                </group>
+<!--                <group string="Group By">-->
+<!--                    <filter string="Product" domain="[]" context="{'group_by':'product_id'}"/>-->
+<!--                    <filter string="Order" domain="[]" context="{'group_by':'order_id'}"/>-->
+<!--                    <filter string="Usuario" domain="[]" context="{'group_by':'salesman_id'}"/>-->
+<!--                </group>-->
             </search>
         </field>
     </record>
