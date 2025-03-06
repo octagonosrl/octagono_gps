@@ -353,11 +353,10 @@
 <!--    Octagono GPS Action Window-->
     <record id="action_octagono_gps" model="ir.actions.act_window">
         <field name="name">Vehiculos</field>
-        <field name="type">ir.actions.act_window</field>
         <field name="res_model">octagono.gps</field>
         <field name="view_mode">tree,kanban,form</field>
         <field name="search_view_id" ref="view_octagono_gps_filter"/>
-        <field name="context">{"search_default_propetario": True, "search_default_done": True}</field>
+        <field name="context">{"search_default_done": 1}</field>
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">
                 Crea un nuevo registro, el primer paso para registrar un vehiculo.
