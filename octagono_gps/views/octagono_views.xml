@@ -396,8 +396,8 @@
         <field name="model">octagono.gps.line</field>
         <field name="arch" type="xml">
             <search string="Search Octagono GPS Line">
-                <filter string="My Octagono Order Lines" domain="[('salesman_id','=',uid)]"
-                        help="Octagono Order Lines related to a Sales Order of mine"/>
+<!--                <filter string="My Octagono Order Lines" domain="[('salesman_id','=',uid)]"-->
+<!--                        help="Octagono Order Lines related to a Sales Order of mine"/>-->
                 <field name="order_id"/>
                 <field name="order_partner_id" operator="child_of"/>
                 <field name="product_id"/>
