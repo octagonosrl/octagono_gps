@@ -75,7 +75,7 @@ class OctagonoGPS(models.Model):
     # next_billing_date = fields.Datetime(string='Próxima fecha de factura', index=True)
     # user_id = fields.Many2one('res.users', string='Usuario', index=True, tracking=True,
     #                           default=lambda self: self.env.user)
-    # partner_id = fields.Many2one('res.partner', string='Propetario', required=True, change_default=True, index=True, tracking=True)
+    partner_id = fields.Many2one('res.partner', string='Propetario', required=True, change_default=True, index=True, tracking=True)
     # partner_name = fields.Char(related='partner_id.name')
     # partner_invoice_id = fields.Many2one('res.partner', string='Invoice Address', readonly=True, required=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Invoice address for current sales order.")
     # partner_shipping_id = fields.Many2one('res.partner', string='Dirección de entrega', readonly=True, required=True,  states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Delivery address for current sales order.")
