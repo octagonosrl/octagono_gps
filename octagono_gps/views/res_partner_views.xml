@@ -34,7 +34,7 @@
                 <field name="mobile" position="after">
                     <field name="octagono_gps_count"/>
                 </field>
-                <xpath expr="//div[hasclass('oe_kanban_partner_links')]" position="inside">
+                <xpath expr="//div[contains(@class, 'o_kanban_record')]" position="inside">
                     <span t-if="record.octagono_gps_count.value>0" class="badge">
                         <i class="fa fa-fw fas fa-car"/>
                         <t t-esc="record.octagono_gps_count.value"/>
